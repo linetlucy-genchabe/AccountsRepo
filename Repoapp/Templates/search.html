@@ -20,47 +20,46 @@
   </div>
 
   <div class="container-fluid">
-      {% if accounts %}
+     
       <div class="container">
         <div class="row">
-          {% for account in accounts %}
-          <div class="col-md-2"></div>
-          <div class="col-md-8" style="float: left;display:flex;">
-            <!-- <div class="card" style=" margin-top: 3%;float:left; margin-left: 2%;padding-top: 1%;">
-              <img src="{{post.pic.url}}" class="card-img-top" alt="..."> 
-              <div class="card-body">
-        
-                <h5 class="card-title"><b>{{account.Name}}</b></h5>
-                <p class="card-text">{{account.Username |truncatewords:15}}</p>
-                 <a href="single/post/{{account.id}}" class="btn" style="background-color: rgb(13, 77, 13); color:white;font-weight:bold;">View Details</a> 
-              </div>
-            </div>
-   -->
+         
+          <div class="col-md-1"></div>
+          <div class="col-md-10" style="float: left;display:flex;">
+            {% if accounts %}
    <table class="table">
+    
     <thead>
       <tr>
         <!-- <th scope="col">#</th> -->
+        
+        <th scope="col"><b>Subcounty</b></th>
         <th scope="col">Name</th>
+        <th scope="col">Community_Health_Unit</th>
         <th scope="col">Contact UUID</th>
         <th scope="col">Username</th>
         <th scope="col">Password</th>
+        
       </tr>
     </thead>
     <tbody>
+        {% for account in accounts %}
       <tr>
         <!-- <th scope="row">1</th> -->
+        <td><b>{{account.account_subcounty}}</b></td>
         <td><b>{{account.Name}}</b></td>
+        <td><b>{{account.Community_Health_Unit}}</b></td>
         <td><b>{{account.Contact_UUID}}</b></td>
         <td><b>{{account.Username}}</b></td>
         <td><b>{{account.Password}}</b></td>
         
       </tr>
-      
+      {% endfor %}
     </tbody>
   </table>
           </div>
         
-          {% endfor %}
+          
         </div>
       </div>
       {% endif %}
