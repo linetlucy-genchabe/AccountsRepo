@@ -9,8 +9,10 @@ urlpatterns = [
     url(r'login/$',views.user_login, name='login'),
     url(r'logout/$',views.signout),
     url(r'^new/account$', views.new_account, name='new-account'),
+    
     url(r'^search/', views.search_accounts, name='search_results'),
     url(r'^profile/$', views.user_profiles, name='profile'),
+    path('update-account/<int:id>', views.update_account, name="update-account"),
    
    
 ]
