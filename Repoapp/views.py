@@ -37,7 +37,11 @@ def user_login(request):
             login(request,user)
             messages.success(request,"Welcome , you are now logged in")
             return redirect ("index")
-    return render(request, 'login.html')
+        else:
+            messages.error(request,'Username or password not correct')
+            return redirect('login')
+        
+    return render(request, 'login.html' )
 
 
 @login_required(login_url='/login/')
@@ -59,6 +63,21 @@ def new_account(request):
     else:
         form = NewAccountForm()
     return render(request, 'new_account.html', {"form": form})
+
+@login_required(login_url='/login/')
+def update_account(request,id):
+    
+    update = Accounts.objects.get(id=id)
+    if request.method == 'POST':
+        form2= AccountUpdateForm(
+            request.POST, request.FILES, instance=update)
+        if form2.is_valid():
+            form2.save()
+            return redirect(index)
+    else:
+        form2 = AccountUpdateForm(instance=update)
+    return render(request, 'edit_account.html', {'form2': form2})
+
 
 @login_required(login_url='/login/')
 def search_accounts(request):
