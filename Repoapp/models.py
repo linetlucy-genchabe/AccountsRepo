@@ -91,7 +91,8 @@ class Accounts(models.Model):
     
     @classmethod
     def search_accounts(cls, search_term):
-        accounts = cls.objects.filter(Name__icontains=search_term)
+        accounts = cls.objects.filter(Username__icontains=search_term)| cls.objects.filter(Name__icontains=search_term)
+
         
         return accounts
     
@@ -119,14 +120,6 @@ class Accounts(models.Model):
             raise Http404()
         
         return account
-    
-    # @classmethod
-    # def update_accounts(request, id):
-    #     account = Accounts.objects.get(pk = id)
-        
-    #     account.Password = request.POST.get('password')
-    #     account.save()
-    #     return HttpResponse('updated')
     
     def update_accounts(self):
         self.update_accounts()

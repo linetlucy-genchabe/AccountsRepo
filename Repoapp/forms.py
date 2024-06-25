@@ -11,7 +11,7 @@ class NewAccountForm(forms.ModelForm):
           'account': forms.Textarea(attrs={'rows':2, 'cols':10,}),
         }
 
-class UpdateAccountForm(forms.ModelForm):
+class AccountUpdateForm(forms.ModelForm):
     class Meta:
         model = Accounts
         exclude = ['Author', 'pub_date', 'author_profile','admin_profile', ]

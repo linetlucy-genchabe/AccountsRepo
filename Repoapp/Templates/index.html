@@ -16,8 +16,8 @@
         <div class="container">
            
             <div class="row">
-              <div class="col-md-1"></div>
-          <div class="col-md-10" style="float: left;display:flex;">
+              <div class="col-md-"></div>
+          <div class="col-md-12" style="float: left;display:flex;">
            {% if accounts %}
    <table class="table">
     
@@ -44,11 +44,18 @@
         <td><b>{{account.Contact_UUID}}</b></td>
         <td><b>{{account.Username}}</b></td>
         <td><b>{{account.Password}}</b></td>
+        
+
+        <td>
+             <a role="button" class="btn btn-sm btn-outline-info"  
+                 href="{% url 'update-account' account.id%}">Edit</a>  
+        </td>
  
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  
           </div>
              
               {% endif %}
