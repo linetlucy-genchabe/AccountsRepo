@@ -63,7 +63,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            ['./Repoapp/templates/']
+            './Repoapp/templates/'
         ],
         'APP_DIRS': True,
         'OPTIONS': {
