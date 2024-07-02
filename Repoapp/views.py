@@ -15,12 +15,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
 # Create your views here.
-
-
-
-
-# Create your views here.
-
 def index(request):
     accounts = Accounts.objects.all()
     counties = County.objects.all()
