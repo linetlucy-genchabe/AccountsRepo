@@ -23,9 +23,9 @@ import json
 
 def index(request):
     accounts = Accounts.objects.all()
-  
+    counties = County.objects.all()
 
-    return render(request, 'index.html', {"accounts":accounts})
+    return render(request, 'index.html', {"accounts":accounts, 'counties':counties})
 
 def user_login(request):
     if request.method =='POST':
@@ -113,7 +113,22 @@ def user_profiles(request):
 
 
     return render(request, 'profile.html', {"form":form})
+@login_required(login_url='/login/')
+def kisumu(request):
+    accounts = Accounts.objects.all()
+    
 
+    return render(request, 'kisumu.html', {"accounts":accounts})
+
+@login_required(login_url='/login/')
+def busia(request):
+    accounts = Accounts.objects.all()
+    
+
+    return render(request, 'busia.html', {"accounts":accounts})
+
+
+ 
 def signout(request):
     logout(request)
     messages.success(request,"You have logged out")
