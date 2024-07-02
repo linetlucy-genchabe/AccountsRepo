@@ -1,1 +1,1 @@
-web: gunicorn --workers=3 --bind=0.0.0.0:8000 --timeout=120 accounts.wsgi
+web: gunicorn uvicorn --workers=3 --bind=0.0.0.0:8000 --timeout=120 accounts.wsgi
