@@ -7,13 +7,47 @@
 </div> -->
 {% if user.is_authenticated %}
 <div class="container_fluid">
+  <div class="container">
+    <div class="container">
+      <div class="row">
+        
+        
+          {% if counties %}
+
+          <h1 style="color: rgb(16, 16, 155);">Counties</h1>
+
+          {% for county in counties %}
+          <div class="col-md-6">
+         
+          <ul class="counties" style="align-items: center;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          list-style-type: none;
+          padding-left: 0px;">
+
+            <a href="kisumu" style=" background-color: paleturquoise;
+            box-shadow: 20px 20px 1px 2px rgba(255, 214, 255, 1);
+            font-size: 35px;
+            margin: 35px;
+            padding: 20px;
+            text-align: center;">{{county.name}} Credentials</a>
+          </ul>
+        </div>
+          {% endfor %}
+          
+          {% endif %}
+          
+        </div>
+      
+  </div>
     <div class="container ">
       <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All SHA Accounts </h1>
       <hr>
 
       <div class="container-fluid">
        
-        <div class="container">
+        
            
             <div class="row">
               <div class="col-md-"></div>

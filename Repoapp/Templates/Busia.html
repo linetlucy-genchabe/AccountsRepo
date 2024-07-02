@@ -1,0 +1,12 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+
+{% if user.is_authenticated %}
+
+<h2>
+    There are no accounts for this county yet!
+</h2>
+
+{% endif %}
+
+{%endblock%}
