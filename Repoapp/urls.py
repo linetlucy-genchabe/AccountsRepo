@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    # url(r'^Repoapp/',include('Repoapp.urls')),
     url(r'login/$',views.user_login, name='login'),
     url(r'logout/$',views.signout),
     url(r'^new/account$', views.new_account, name='new-account'),
