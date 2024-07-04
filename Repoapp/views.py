@@ -19,7 +19,7 @@ def index(request):
     accounts = Accounts.objects.all()
     counties = County.objects.all()
 
-    return render(request, 'index.html', {"accounts":accounts, 'counties':counties})
+    return render(request, './index.html', {"accounts":accounts, 'counties':counties})
 
 
 def user_login(request):
