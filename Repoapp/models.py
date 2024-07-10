@@ -21,6 +21,8 @@ class Category(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+
     
 
     def save_profile(self):
