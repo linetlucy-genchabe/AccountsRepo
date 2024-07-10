@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['*','https://accountsrepo.up.railway.app']
 # Application definition
 
 INSTALLED_APPS = [
-    'repoapp.apps.RepoappConfig',
+    'Repoapp.apps.RepoappConfig',
     'bootstrap5',
     'crispy_forms',
     'django.contrib.admin',
