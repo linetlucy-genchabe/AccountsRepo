@@ -1,1 +1,1 @@
-web: gunicorn uvicorn --log-level debug accounts.wsgi --log-file --
+web: gunicorn  accounts.wsgi 
