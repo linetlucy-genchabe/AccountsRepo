@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config,Csv
 import django_heroku
 import dj_database_url
 
@@ -85,14 +86,11 @@ WSGI_APPLICATION = 'accounts.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
+DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@monorail.proxy.rlwy.net:13964/railway'
 DATABASES = {
-    'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'railway',
-    'USER': 'postgres',
-    'PASSWORD':'srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe',
-    
-    }
+    'default': 
+    dj_database_url.parse(DATABASE_URL,conn_max_age=600),
 }
 
 
