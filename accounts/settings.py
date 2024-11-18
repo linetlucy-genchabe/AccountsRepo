@@ -153,4 +153,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 LOGIN_REDIRECT_URL ='/accounts/profile/'
 
-DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@monorail.proxy.rlwy.net:13964/railway'
+# DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@monorail.proxy.rlwy.net:13964/railway'
