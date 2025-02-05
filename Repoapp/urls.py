@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^search/', views.search_accounts, name='search_results'),
     url(r'^profile/$', views.user_profiles, name='profile'),
     path('update-account/<int:id>', views.update_account, name="update-account"),
+    url(r'export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
    
    
 ]
