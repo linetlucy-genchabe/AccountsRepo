@@ -11,7 +11,7 @@ from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-
+import csv
 from django.http import JsonResponse
 import json
 
@@ -123,7 +123,35 @@ def busia(request):
 
     return render(request, 'busia.html', {"accounts":accounts})
 
+def export_accounts_csv(request):
+    # Define response as a CSV file
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="accounts.csv"'
 
+    # Create a CSV writer
+    writer = csv.writer(response)
+    
+    # Write the header row
+    writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
+                     'Account Category', 'Subcounty', 'County'])
+
+    # Fetch all accounts and write to CSV
+    accounts = Accounts.objects.all()
+    for account in accounts:
+        writer.writerow([
+            account.Name, 
+            account.Contact_UUID, 
+            account.Community_Health_Unit, 
+            account.Username,
+            account.Password,
+            account.account_category.name, 
+            account.account_subcounty.name, 
+            account.account_county.name, 
+            # account.Admin.username if account.Admin else "N/A",
+            # account.pub_date.strftime('%Y-%m-%d %H:%M:%S')  # Format the date
+        ])
+
+    return response
  
 def signout(request):
     logout(request)
