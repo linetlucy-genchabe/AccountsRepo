@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import get_object_or_404, render,redirect
 from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
@@ -110,18 +110,22 @@ def user_profiles(request):
 
     return render(request, 'profile.html', {"form":form})
 @login_required(login_url='/login/')
-def kisumu(request):
-    accounts = Accounts.objects.all()
+
+def county(request):
+    counties=County.objects.all()
     
 
-    return render(request, 'kisumu.html', {"accounts":accounts})
+    return render(request, 'index.html', {"counties":counties})
 
-@login_required(login_url='/login/')
-def busia(request):
-    accounts = Accounts.objects.all()
-    
+def county_detail(request, county_id):
+    county = get_object_or_404(County, id=county_id)
+    subcounty = county.subcounty.all()  # Fetch subcounties for this county
+    return render(request, 'county.html', {'county': county, 'subcounty': subcounty})
 
-    return render(request, 'busia.html', {"accounts":accounts})
+def subcounty_detail(request, subcounty_id):
+    subcounty = get_object_or_404(Subcounty, id=subcounty_id)
+    accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
+    return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
 def export_accounts_csv(request):
     # Define response as a CSV file
