@@ -1,0 +1,75 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+
+{% if user.is_authenticated %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subcounty.name }} - Accounts</title>
+</head>
+<body>
+    <h1>{{ subcounty.name }} - Accounts</h1>
+    <ul>
+        {% for account in accounts %}
+        <!-- <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
+        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
+        font-size: 35px;
+        margin: 35px;
+        padding: 20px;
+        text-align: center;">{{subcounty.name}} Credentials</a> -->
+           <a><li>{{ account.Name }}</li></a> 
+
+           <table class="table">
+    
+            <thead>
+               
+              <tr>
+                 <!-- <th scope="col">#</th>  -->
+                <th scope="col">Subcounty</th>
+                <th scope="col">Name</th>
+                <th scope="col">Community_Health_Unit</th>
+                <th scope="col">Contact UUID</th>
+                <th scope="col">Username</th>
+                <th scope="col">Password</th>
+                <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th>
+               
+              </tr>
+            </thead>
+            
+            <tbody>
+                {% for account in accounts %}
+              <tr>
+                <!-- <th scope="row">1</th> -->
+                <td><b>{{account.account_subcounty}}</b></td>
+                <td><b>{{account.Name}}</b></td>
+                <td><b>{{account.Community_Health_Unit}}</b></td>
+                <td><b>{{account.Contact_UUID}}</b></td>
+                <td><b>{{account.Username}}</b></td>
+                <td><b>{{account.Password}}</b></td>
+                
+        
+                <td>
+                     <a role="button" class="btn btn-sm btn-outline-info"  
+                         href="{% url 'update-account' account.id%}">Edit</a>  
+                </td>
+         
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        {% empty %}
+            <li>No accounts available</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'county' %}">Back to SubCounties</a>
+
+</body>
+
+
+{% endif %}
+
+{%endblock%}
