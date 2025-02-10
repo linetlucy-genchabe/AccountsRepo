@@ -1,0 +1,38 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ county.name }} - Subcounties</title>
+</head>
+<body>
+    <h1>{{ county.name }} - Subcounties</h1>
+    <ul>
+        {% for subcounty in subcounty %}
+        <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
+        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
+        font-size: 35px;
+        margin: 35px;
+        padding: 20px;
+        text-align: center;">{{subcounty.name}} Credentials</a>
+
+           <!-- <a><li>{{ subcounty.name }}</li></a>  -->
+        {% empty %}
+            <li>No subcounties available</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'county' %}">Back to Counties</a>
+
+<!-- <h1>List of Counties</h1>
+<ul>
+    {% for county in counties %}
+        <li><a href="{% url 'county_detail' county.id %}">{{ county.name }}</a></li>
+    {% endfor %}
+</ul> -->
+</body>
+
+
+{%endblock%}
