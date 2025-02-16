@@ -8,11 +8,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ subcounty.name }} - Accounts</title>
+    <!-- <title>{{ subcounty.name }} - Accounts</title> -->
 </head>
 <body>
-    <h1>{{ subcounty.name }} - Accounts</h1>
-    <ul>
+
+  <div class="container ">
+    <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ subcounty.name }} - Accounts </h1>
+    <hr>
+
+    <!-- <h1>{{ subcounty.name }} - Accounts</h1> -->
+    <ul class="counties" style="align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style-type: none;
+    padding-left: 0px;">
         {% for account in accounts %}
         <!-- <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
         box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
@@ -20,7 +30,7 @@
         margin: 35px;
         padding: 20px;
         text-align: center;">{{subcounty.name}} Credentials</a> -->
-           <a><li>{{ account.Name }}</li></a> 
+           <!-- <a><li>{{ account.Name }}</li></a>  -->
 
            <table class="table">
     
@@ -66,7 +76,7 @@
         {% endfor %}
     </ul>
     <a href="{% url 'county' %}">Back to SubCounties</a>
-
+</div>
 </body>
 
 
