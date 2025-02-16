@@ -243,6 +243,37 @@ def bulk_upload_accounts(request):
         form = AccountUploadForm()
     
     return render(request, 'bulk_upload.html', {'form': form})
+
+def export_subcounty_accounts_csv(request, subcounty_id):
+    print(f"Subcounty ID received: {subcounty_id}")  # Debugging step
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="subcounty_{subcounty_id}_accounts.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
+                     'Account Category', 'Subcounty', 'County'])
+
+    try:
+        accounts = Accounts.objects.filter(account_subcounty_id=subcounty_id)
+        print(f"Accounts found: {accounts.count()}")  # Debugging step
+    except Exception as e:
+        print(f"Error: {e}")  # Debugging step
+        accounts = []
+
+    for account in accounts:
+        writer.writerow([
+            account.Name, 
+            account.Contact_UUID, 
+            account.Community_Health_Unit, 
+            account.Username,
+            account.Password,
+            account.account_category.name, 
+            account.account_subcounty.name, 
+            account.account_county.name
+        ])
+
+    return response
  
 def signout(request):
     logout(request)
