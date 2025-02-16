@@ -20,12 +20,14 @@
 
               {% bootstrap_form form%}
               
-              <input type="submit" class="btn btn-info btn-lg font-weight-bold" value="SUBMIT">
+              <input type="submit" class="btn btn-outline-info btn-lg font-weight-bold" value="SUBMIT">
             </form>
       </div>
 
       <div class="col-lg-3"></div>
     
   </div>
+  <a href="{% url 'bulk_upload_accounts' %}" class="btn btn-outline-primary">Bulk Upload Accounts</a>
+
 </div>
 {% endblock %}
