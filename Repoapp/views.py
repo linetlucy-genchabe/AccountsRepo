@@ -127,7 +127,41 @@ def subcounty_detail(request, subcounty_id):
     accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
+# def export_accounts_csv(request):
+#     # Define response as a CSV file
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="accounts.csv"'
+
+#     # Create a CSV writer
+#     writer = csv.writer(response)
+    
+#     # Write the header row
+#     writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
+#                      'Account Category', 'Subcounty', 'County'])
+
+#     # Fetch all accounts and write to CSV
+#     accounts = Accounts.objects.all()
+#     for account in accounts:
+#         writer.writerow([
+#             account.Name, 
+#             account.Contact_UUID, 
+#             account.Community_Health_Unit, 
+#             account.Username,
+#             account.Password,
+#             account.account_category.name, 
+#             account.account_subcounty.name, 
+#             account.account_county.name, 
+#             # account.Admin.username if account.Admin else "N/A",
+#             # account.pub_date.strftime('%Y-%m-%d %H:%M:%S')  # Format the date
+#         ])
+
+#     return response
+
 def export_accounts_csv(request):
+    # Get filter parameters
+    county_id = request.GET.get('county')
+    subcounty_id = request.GET.get('subcounty')
+
     # Define response as a CSV file
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="accounts.csv"'
@@ -139,8 +173,16 @@ def export_accounts_csv(request):
     writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
-    # Fetch all accounts and write to CSV
+    # Fetch accounts based on filters
     accounts = Accounts.objects.all()
+    if county_id:
+        county = get_object_or_404(County, id=county_id)
+        accounts = accounts.filter(account_county=county)
+    if subcounty_id:
+        subcounty = get_object_or_404(Subcounty, id=subcounty_id)
+        accounts = accounts.filter(account_subcounty=subcounty)
+
+    # Write account data to CSV
     for account in accounts:
         writer.writerow([
             account.Name, 
@@ -151,11 +193,56 @@ def export_accounts_csv(request):
             account.account_category.name, 
             account.account_subcounty.name, 
             account.account_county.name, 
-            # account.Admin.username if account.Admin else "N/A",
-            # account.pub_date.strftime('%Y-%m-%d %H:%M:%S')  # Format the date
         ])
 
     return response
+
+def bulk_upload_accounts(request):
+    if request.method == "POST":
+        form = AccountUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['file']
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, 'Invalid file format. Please upload a CSV file.')
+                return redirect('bulk_upload_accounts')
+
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.reader(decoded_file)
+            next(reader)  # Skip header row
+
+            success_count = 0
+            error_count = 0
+
+            for row in reader:
+                try:
+                    name, contact_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
+                    
+                    category, _ = Category.objects.get_or_create(name=category_name)
+                    county, _ = County.objects.get_or_create(name=county_name)
+                    subcounty, _ = Subcounty.objects.get_or_create(name=subcounty_name, account_county=county)
+
+                    Accounts.objects.create(
+                        Name=name,
+                        Contact_UUID=contact_uuid,
+                        Community_Health_Unit=community_health_unit,
+                        Username=username,
+                        Password=password,
+                        account_category=category,
+                        account_subcounty=subcounty,
+                        account_county=county
+                    )
+                    success_count += 1
+                except Exception as e:
+                    print(f"Error importing row: {row} - {str(e)}")
+                    error_count += 1
+
+            messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
+            return redirect('bulk_upload_accounts')
+
+    else:
+        form = AccountUploadForm()
+    
+    return render(request, 'bulk_upload.html', {'form': form})
  
 def signout(request):
     logout(request)
