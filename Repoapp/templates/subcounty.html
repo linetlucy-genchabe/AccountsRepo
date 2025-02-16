@@ -44,7 +44,11 @@
                 <th scope="col">Contact UUID</th>
                 <th scope="col">Username</th>
                 <th scope="col">Password</th>
-                <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th>
+                <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
+                <th><a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn btn-outline-primary">
+                  Download {{ subcounty.name }} Accounts
+              </a>
+              </th>
                
               </tr>
             </thead>
