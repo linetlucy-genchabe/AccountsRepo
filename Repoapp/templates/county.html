@@ -6,11 +6,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ county.name }} - Subcounties</title>
+    <!-- <title>{{ county.name }} - Subcounties</title> -->
 </head>
 <body>
-    <h1>{{ county.name }} - Subcounties</h1>
-    <ul>
+    <div class="container ">
+        <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ county.name }} - Subcounties </h1>
+        <hr>
+
+    <!-- <h1>{{ county.name }} - Subcounties</h1> -->
+    <ul class="counties" style="align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style-type: none;
+    padding-left: 0px;">
         {% for subcounty in subcounty %}
         <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
         box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
@@ -24,7 +33,7 @@
             <li>No subcounties available</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'county' %}">Back to Counties</a>
+    <a href="{% url 'county' %}"  style="margin-top: 3%;">Back to Counties</a>
 
 <!-- <h1>List of Counties</h1>
 <ul>
@@ -32,6 +41,8 @@
         <li><a href="{% url 'county_detail' county.id %}">{{ county.name }}</a></li>
     {% endfor %}
 </ul> -->
+
+</div>
 </body>
 
 
