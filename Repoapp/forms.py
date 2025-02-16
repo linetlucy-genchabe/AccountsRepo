@@ -26,3 +26,5 @@ class ProfileUpdateForm(forms.ModelForm):
         widgets = {
           'bio': forms.Textarea(attrs={'rows':2, 'cols':10,}),
         }
+class AccountUploadForm(forms.Form):
+    file = forms.FileField(label="Upload CSV File")
