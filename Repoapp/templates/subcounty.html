@@ -45,10 +45,10 @@
                 <th scope="col">Username</th>
                 <th scope="col">Password</th>
                 <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-                <th><a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn btn-outline-primary">
+                <!-- <th><a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn btn-outline-primary">
                   Download {{ subcounty.name }} Accounts
               </a>
-              </th>
+              </th> -->
                
               </tr>
             </thead>
@@ -79,7 +79,7 @@
             <li>No accounts available</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'county' %}">Back to SubCounties</a>
+    <a href="{% url 'county' %}">Back to Counties</a>
 </div>
 </body>
 
