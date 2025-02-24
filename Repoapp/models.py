@@ -143,7 +143,7 @@ class Dashboards(models.Model):
     account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE,related_name="dashboardnames")
     account_county = models.ForeignKey(County, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
-    Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    # Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     admin_profile = models.ForeignKey(Profile,on_delete=models.CASCADE, blank=True, default='1')
     
     

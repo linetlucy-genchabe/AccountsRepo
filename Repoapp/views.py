@@ -271,7 +271,7 @@ def bulk_upload_accounts(request):
                     # Get or create related objects
                     category, _ = Category.objects.get_or_create(name=category_name)
                     county, _ = County.objects.get_or_create(name=county_name)
-                    subcounty, _ = Subcounty.objects.get_or_create(name=subcounty_name, account_county=county)
+                    subcounty, _ = Subcounty.objects.get_or_create(name=subcounty_name, subcounty_county=county)
 
                     # Create account
                     Accounts.objects.create(
