@@ -1,10 +1,7 @@
 {%extends 'base.html'%}{%load bootstrap5%}{% load static %}
 {%block content%}
 
-<!-- <div class="container">
-<img src="/static/images/Afya Nyumbani Magazine 1st Edition Cover.png" alt="mainpage" style="height: 550px;margin-top: 1%;">
 
-</div> -->
 {% if user.is_authenticated %}
 <div class="container_fluid">
   <div class="container">
@@ -12,39 +9,12 @@
       <div class="row">
         
       
-      
-      
-          {% if counties %}
-
-          <h1 style="color: rgb(16, 16, 155);">Counties</h1>
-
-          {% for county in counties %}
-          <div class="col-md-6">
-         
-          <ul class="counties" style="align-items: center;
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          list-style-type: none;
-          padding-left: 0px;">
-
-            <a href="{% url 'county_detail' county.id %}" style=" background-color: rgb(207, 246, 246);
-            box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-            font-size: 35px;
-            margin: 35px;
-            padding: 20px;
-            text-align: center;">{{county.name}} Credentials</a>
-          </ul>
-        </div>
-          {% endfor %}
-          
-          {% endif %}
           
         </div>
       
   </div>
     <div class="container ">
-      <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All eCHIS Accounts </h1>
+      <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All Dashboard Accounts </h1>
       <hr>
 
       <div class="container-fluid">
@@ -54,52 +24,38 @@
             <div class="row">
               <div class="col-md-"></div>
           <div class="col-md-12" style="float: left;display:flex;">
-           {% if accounts %}
+           {% if dashboards %}
    <table class="table">
     
     <thead>
        
       <tr>
          <!-- <th scope="col">#</th>  -->
+         <th scope="col">County</th>
         <th scope="col">Subcounty</th>
         <th scope="col">Name</th>
+        <th scope="col">Role</th>
         <th scope="col">Community_Health_Unit</th>
-        <th scope="col">Contact UUID</th>
+        <!-- <th scope="col">Contact UUID</th> -->
         <th scope="col">Username</th>
         <th scope="col">Password</th>
         <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-        <th><div class="dropdown">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Download
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}">Download All Accounts</a></li>
-              
-              <!-- County-based download -->
-              {% for county in counties %}
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?county={{ county.id }}">{{ county.name }} Accounts</a></li>
-              {% endfor %}
-      
-              <!-- Subcounty-based download -->
-              {% for subcounty in subcounties %}
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?subcounty={{ subcounty.id }}">{{ subcounty.name }} Accounts</a></li>
-              {% endfor %}
-          </ul>
-      </div></th>
       
       </tr>
     </thead>
     
     <tbody>
-        {% for account in accounts %}
+        {% for dashboard in dashboards %}
       <tr>
         <!-- <th scope="row">1</th> -->
-        <td><b>{{account.account_subcounty}}</b></td>
-        <td><b>{{account.Name}}</b></td>
-        <td><b>{{account.Community_Health_Unit}}</b></td>
-        <td><b>{{account.Contact_UUID}}</b></td>
-        <td><b>{{account.Username}}</b></td>
-        <td><b>{{account.Password}}</b></td>
+        <td><b>{{dashboard.account_County}}</b></td>
+        <td><b>{{dashboard.account_subcounty}}</b></td>
+        <td><b>{{dashboard.Name}}</b></td>
+        <td><b>{{dashboard.Role}}</b></td>
+        <td><b>{{dashboard.Community_Health_Unit}}</b></td>
+        <!-- <td><b>{{dashboard.Contact_UUID}}</b></td> -->
+        <td><b>{{dashboard.Username}}</b></td>
+        <td><b>{{dashboard.Password}}</b></td>
         
 
         <td>
