@@ -200,6 +200,7 @@ def export_accounts_csv(request):
         writer.writerow([
             account.Name, 
             account.Contact_UUID, 
+            account.Area_UUID,
             account.Community_Health_Unit, 
             account.Username,
             account.Password,
@@ -231,7 +232,7 @@ def bulk_upload_accounts(request):
 
             for row in reader:
                 try:
-                    name, contact_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
+                    name, contact_uuid,area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
 
                     # Check if username or contact_uuid already exists
                     if Accounts.objects.filter(Username=username).exists():
@@ -251,6 +252,7 @@ def bulk_upload_accounts(request):
                     Accounts.objects.create(
                         Name=name,
                         Contact_UUID=contact_uuid,
+                        Area_UUID=area_uuid,
                         Community_Health_Unit=community_health_unit,
                         Username=username,
                         Password=password,
