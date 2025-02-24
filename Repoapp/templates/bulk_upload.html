@@ -2,12 +2,25 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Bulk Upload Accounts</h2>
-    
-    <!-- {% if messages %}
+    {% if messages %}
+    <div id="popupMessage" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        background-color: #f8d7da; color: #721c24; padding: 10px 20px; border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.2); display: block; z-index: 1000;">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            <p>{{ message }}</p>
         {% endfor %}
-    {% endif %} -->
+    </div>
+
+    <script>
+        setTimeout(function () {
+            var popup = document.getElementById("popupMessage");
+            if (popup) {
+                popup.style.display = "none";
+            }
+        }, 3000);
+    </script>
+{% endif %}
+
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

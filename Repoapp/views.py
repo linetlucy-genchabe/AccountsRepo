@@ -66,6 +66,27 @@ def new_account(request):
         form = NewAccountForm()
     return render(request, 'new_account.html', {"form": form})
 
+
+@login_required(login_url='/login/')
+def new_dashboard(request):
+    current_user = request.user
+    profile = request.user.profile
+   
+
+    if request.method == 'POST':
+        form = NewDashboardAccountForm(request.POST, request.FILES)
+        if form.is_valid():
+            dashboardaccount = form.save(commit=False)
+            dashboardaccount.Author = current_user
+            dashboardaccount.author_profile = profile
+
+            dashboardaccount.save()
+        return redirect('dashboards')
+
+    else:
+        form4 = NewDashboardAccountForm()
+    return render(request, 'new_dashboard.html', {"form4": form4})
+
 @login_required(login_url='/login/')
 def update_account(request,id):
     
@@ -189,53 +210,6 @@ def export_accounts_csv(request):
 
     return response
 
-# def bulk_upload_accounts(request):
-#     if request.method == "POST":
-#         form = AccountUploadForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             csv_file = request.FILES['file']
-#             if not csv_file.name.endswith('.csv'):
-#                 messages.error(request, 'Invalid file format. Please upload a CSV file.')
-#                 return redirect('bulk_upload_accounts')
-
-#             decoded_file = csv_file.read().decode('utf-8').splitlines()
-#             reader = csv.reader(decoded_file)
-#             next(reader)  # Skip header row
-
-#             success_count = 0
-#             error_count = 0
-
-#             for row in reader:
-#                 try:
-#                     name, contact_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
-                    
-#                     category, _ = Category.objects.get_or_create(name=category_name)
-#                     county, _ = County.objects.get_or_create(name=county_name)
-#                     subcounty, _ = Subcounty.objects.get_or_create(name=subcounty_name, account_county=county)
-
-#                     Accounts.objects.create(
-#                         Name=name,
-#                         Contact_UUID=contact_uuid,
-#                         Community_Health_Unit=community_health_unit,
-#                         Username=username,
-#                         Password=password,
-#                         account_category=category,
-#                         account_subcounty=subcounty,
-#                         account_county=county
-#                     )
-#                     success_count += 1
-#                 except Exception as e:
-#                     print(f"Error importing row: {row} - {str(e)}")
-#                     error_count += 1
-
-#             messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
-#             return redirect('bulk_upload_accounts')
-
-#     else:
-#         form = AccountUploadForm()
-    
-#     return render(request, 'bulk_upload.html', {'form': form})
-
 def bulk_upload_accounts(request):
     if request.method == "POST":
         form = AccountUploadForm(request.POST, request.FILES)
@@ -282,7 +256,8 @@ def bulk_upload_accounts(request):
                         Password=password,
                         account_category=category,
                         account_subcounty=subcounty,
-                        account_county=county
+                        account_county=county,
+                        Admin=request.user
                     )
                     success_count += 1
                 except Exception as e:

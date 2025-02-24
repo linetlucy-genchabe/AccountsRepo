@@ -69,6 +69,7 @@ class Subcounty(models.Model):
 class Accounts(models.Model):
     Name = models.CharField(max_length=255)
     Contact_UUID = models.CharField(max_length=1000)
+    Area_UUID = models.CharField(max_length=1000)
     Community_Health_Unit = models.CharField(max_length=255)
     Username = models.CharField(max_length=255)
     Password = models.CharField(max_length=255)
