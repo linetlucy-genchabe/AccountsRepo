@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^search/', views.search_accounts, name='search_results'),
     url(r'^profile/$', views.user_profiles, name='profile'),
     path('update-account/<int:id>', views.update_account, name="update-account"),
+    path('update-dashboard/<int:id>', views.update_dashboard, name="update-dashboard"),
     url(r'export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
     path('export-accounts/subcounty/<int:subcounty_id>/', views.export_subcounty_accounts_csv, name='export_subcounty_accounts_csv'),
     path('bulk-upload/', views.bulk_upload_accounts, name='bulk_upload_accounts'),

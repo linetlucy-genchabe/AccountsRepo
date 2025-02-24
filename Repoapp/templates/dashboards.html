@@ -35,7 +35,7 @@
         <th scope="col">Subcounty</th>
         <th scope="col">Name</th>
         <th scope="col">Role</th>
-        <th scope="col">Community_Health_Unit</th>
+        <!-- <th scope="col">Community_Health_Unit</th> -->
         <!-- <th scope="col">Contact UUID</th> -->
         <th scope="col">Username</th>
         <th scope="col">Password</th>
@@ -48,11 +48,11 @@
         {% for dashboard in dashboards %}
       <tr>
         <!-- <th scope="row">1</th> -->
-        <td><b>{{dashboard.account_County}}</b></td>
+        <td><b>{{dashboard.account_county}}</b></td>
         <td><b>{{dashboard.account_subcounty}}</b></td>
         <td><b>{{dashboard.Name}}</b></td>
         <td><b>{{dashboard.Role}}</b></td>
-        <td><b>{{dashboard.Community_Health_Unit}}</b></td>
+        <!-- <td><b>{{dashboard.Community_Health_Unit}}</b></td> -->
         <!-- <td><b>{{dashboard.Contact_UUID}}</b></td> -->
         <td><b>{{dashboard.Username}}</b></td>
         <td><b>{{dashboard.Password}}</b></td>
@@ -60,7 +60,7 @@
 
         <td>
              <a role="button" class="btn btn-sm btn-outline-info"  
-                 href="{% url 'update-account' account.id%}">Edit</a>  
+                 href="{% url 'update-dashboard' dashboard.id%}">Edit</a>  
         </td>
  
       </tr>

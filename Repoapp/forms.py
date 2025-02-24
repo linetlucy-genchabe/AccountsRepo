@@ -19,6 +19,15 @@ class AccountUpdateForm(forms.ModelForm):
           'account': forms.Textarea(attrs={'rows':2, 'cols':10,}),
         }
 
+class DashboardUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Dashboards
+        exclude = ['Author', 'pub_date', 'author_profile','admin_profile', ]
+        widgets = {
+          'account': forms.Textarea(attrs={'rows':2, 'cols':10,}),
+        }
+
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
