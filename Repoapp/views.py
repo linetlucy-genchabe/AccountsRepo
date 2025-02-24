@@ -23,6 +23,12 @@ def index(request):
     return render(request, 'index.html', {"accounts":accounts, 'counties':counties})
 
 
+def dashboards(request):
+    dashboards = Dashboards.objects.all()
+    counties = County.objects.all()
+
+    return render(request, 'dashboards.html', {"dashboards":dashboards, 'counties':counties})
+
 def user_login(request):
     if request.method =='POST':
         username = request.POST['username']
