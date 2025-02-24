@@ -133,3 +133,70 @@ class Accounts(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'My Accounts'
         verbose_name_plural = 'Accounts'
+
+class Dashboards(models.Model):
+    Name = models.CharField(max_length=255)
+    Role = models.CharField(max_length=255)
+    Community_Health_Unit = models.CharField(max_length=255)
+    Username = models.CharField(max_length=255)
+    Password = models.CharField(max_length=255)
+    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE,related_name="dashboardnames")
+    account_county = models.ForeignKey(County, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField(auto_now_add=True)
+    Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    admin_profile = models.ForeignKey(Profile,on_delete=models.CASCADE, blank=True, default='1')
+    
+    
+    def save_dashboards(self):
+        self.save()
+    
+    def delete_dashboards(self):
+        self.delete()
+        
+    @classmethod
+    def get_alldashboards(cls):
+        dashboards = cls.objects.all()
+        return dashboards
+    
+    @classmethod
+    def search_dashboards(cls, search_term):
+        dashboards = cls.objects.filter(Username__icontains=search_term)| cls.objects.filter(Name__icontains=search_term)
+
+        
+        return dashboards
+    
+    @classmethod
+    def get_by_Category(cls, categories):
+        dashboards = cls.objects.filter(category__name__icontains=categories)
+        return dashboards
+    
+    @classmethod
+    def get_by_County(cls, counties):
+        dashboards = cls.objects.filter(category__name__icontains=counties)
+        return dashboards
+    
+    @classmethod
+    def get_by_Subcounty(cls, subcounties):
+        dashboards = cls.objects.filter(category__name__icontains=subcounties)
+        return dashboards
+    
+    @classmethod
+    def get_dashboards(request, id):
+        try:
+            dashboard = Dashboards.objects.get(pk = id)
+            
+        except ObjectDoesNotExist:
+            raise Http404()
+        
+        return dashboard
+    
+    def update_dashboards(self):
+        self.update_dashboards()
+    
+    def __str__(self):
+        return self.Name
+    
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'My Dashboards'
+        verbose_name_plural = 'Dashboards'
