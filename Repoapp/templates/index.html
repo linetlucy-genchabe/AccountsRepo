@@ -45,6 +45,9 @@
   </div>
     <div class="container ">
       <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All eCHIS Accounts </h1>
+      
+        <a class="nav-link font-weight-bold" href="{%url 'new-account'%}" style="color: rgb(7, 5, 132);"> ADD NEW ACCOUNT </a>
+      
       <hr>
 
       <div class="container-fluid">
@@ -65,6 +68,7 @@
         <th scope="col">Name</th>
         <th scope="col">Community_Health_Unit</th>
         <th scope="col">Contact UUID</th>
+        <th scope="col">Area UUID</th>
         <th scope="col">Username</th>
         <th scope="col">Password</th>
         <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
@@ -98,6 +102,7 @@
         <td><b>{{account.Name}}</b></td>
         <td><b>{{account.Community_Health_Unit}}</b></td>
         <td><b>{{account.Contact_UUID}}</b></td>
+        <td><b>{{account.Area_UUID}}</b></td>
         <td><b>{{account.Username}}</b></td>
         <td><b>{{account.Password}}</b></td>
         

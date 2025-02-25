@@ -69,7 +69,7 @@ class Subcounty(models.Model):
 class Accounts(models.Model):
     Name = models.CharField(max_length=255)
     Contact_UUID = models.CharField(max_length=1000)
-    Area_UUID = models.CharField(max_length=1000, null=True ,blank=True, default ='1')
+    Area_UUID = models.CharField(max_length=1000, null=True ,blank=True)
     Community_Health_Unit = models.CharField(max_length=255)
     Username = models.CharField(max_length=255)
     Password = models.CharField(max_length=255)
@@ -108,11 +108,14 @@ class Accounts(models.Model):
     def get_by_County(cls, counties):
         accounts = cls.objects.filter(category__name__icontains=counties)
         return accounts
-    
     @classmethod
-    def get_by_Subcounty(cls, subcounties):
-        accounts = cls.objects.filter(category__name__icontains=subcounties)
-        return accounts
+    def get_by_Subcounty(cls, subcounty):
+        return cls.objects.filter(account_subcounty=subcounty)
+
+    # @classmethod
+    # def get_by_Subcounty(cls, subcounties):
+    #     accounts = cls.objects.filter(category__name__icontains=subcounties)
+    #     return accounts
     
     @classmethod
     def get_accounts(request, id):

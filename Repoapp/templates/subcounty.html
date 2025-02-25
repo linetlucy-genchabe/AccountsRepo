@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>{{ subcounty.name }} - Accounts</title> -->
+    
 </head>
 <body>
 
@@ -16,21 +16,15 @@
     <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ subcounty.name }} - Accounts </h1>
     <hr>
 
-    <!-- <h1>{{ subcounty.name }} - Accounts</h1> -->
+    
     <ul class="counties" style="align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     list-style-type: none;
     padding-left: 0px;">
-        {% for account in accounts %}
-        <!-- <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
-        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-        font-size: 35px;
-        margin: 35px;
-        padding: 20px;
-        text-align: center;">{{subcounty.name}} Credentials</a> -->
-           <!-- <a><li>{{ account.Name }}</li></a>  -->
+        
+        
 
            <table class="table">
     
@@ -42,6 +36,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Community_Health_Unit</th>
                 <th scope="col">Contact UUID</th>
+                <th scope="col">Area UUID</th>
                 <th scope="col">Username</th>
                 <th scope="col">Password</th>
                 <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
@@ -61,6 +56,7 @@
                 <td><b>{{account.Name}}</b></td>
                 <td><b>{{account.Community_Health_Unit}}</b></td>
                 <td><b>{{account.Contact_UUID}}</b></td>
+                <td><b>{{account.Area_UUID}}</b></td>
                 <td><b>{{account.Username}}</b></td>
                 <td><b>{{account.Password}}</b></td>
                 
@@ -74,16 +70,18 @@
               {% endfor %}
             </tbody>
           </table>
-
-        {% empty %}
+          
+        {% else %}
             <li>No accounts available</li>
-        {% endfor %}
+            {% endif %}
+            
+        
     </ul>
     <a href="{% url 'county' %}">Back to Counties</a>
 </div>
 </body>
 
 
-{% endif %}
+
 
 {%endblock%}

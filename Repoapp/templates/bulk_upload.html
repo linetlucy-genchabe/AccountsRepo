@@ -2,24 +2,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Bulk Upload Accounts</h2>
-    {% if messages %}
-    <div id="popupMessage" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-        background-color: #f8d7da; color: #721c24; padding: 10px 20px; border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.2); display: block; z-index: 1000;">
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    </div>
-
-    <script>
-        setTimeout(function () {
-            var popup = document.getElementById("popupMessage");
-            if (popup) {
-                popup.style.display = "none";
-            }
-        }, 3000);
-    </script>
-{% endif %}
+    
 
 
     <form method="post" enctype="multipart/form-data">
@@ -34,6 +17,25 @@
     <hr>
 
     <h4>CSV Format:</h4>
-    <p><strong>Columns:</strong> Name, Contact UUID, Community Health Unit, Username, Password, Account Category, Subcounty, County</p>
+    <p><strong>Columns:</strong> Name, Contact UUID, Area UUID, Community Health Unit, Username, Password, Account Category, Subcounty, County</p>
+
+    {% if messages %}
+    <div id="popupMessage" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        background-color: #f8d7da; color: #721c24; padding: 10px 20px; border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.2); display: block; z-index: 1000; margin-top: 6%;">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        setTimeout(function () {
+            var popup = document.getElementById("popupMessage");
+            if (popup) {
+                popup.style.display = "none";
+            }
+        }, 8000);
+    </script>
+{% endif %}
 </div>
 {% endblock %}

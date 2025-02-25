@@ -15,8 +15,11 @@
   </div>
     <div class="container ">
       <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All Dashboard Accounts </h1>
+      
+        <a class="nav-link font-weight-bold" href="{%url 'new-dashboard'%}" style="color: rgb(2, 14, 100);"> NEW Dashboard ACCOUNT </a>
+     
       <hr>
-
+      
       <div class="container-fluid">
        
         
@@ -40,7 +43,20 @@
         <th scope="col">Username</th>
         <th scope="col">Password</th>
         <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-      
+      <th>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Download CSV
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                <li><a class="dropdown-item" href="{% url 'export_dashboards_csv' %}">All Counties</a></li>
+                {% for county in counties %}
+                    <li><a class="dropdown-item" href="{% url 'export_dashboards_csv_by_county' county.id %}">{{ county.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+      </th>
       </tr>
     </thead>
     
