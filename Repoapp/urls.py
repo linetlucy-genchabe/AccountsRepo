@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'login/$',views.user_login, name='login'),
     url(r'logout/$',views.signout),
     url(r'^new/account$', views.new_account, name='new-account'),
+    url(r'^new/dashboard$', views.new_dashboard, name='new-dashboard'),
     path('county/', views.county, name='county'),
     path('dashboards/', views.dashboards, name='dashboards'),
     path('county/<int:county_id>/', views.county_detail, name='county_detail'),
@@ -20,6 +21,8 @@ urlpatterns = [
     url(r'export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
     path('export-accounts/subcounty/<int:subcounty_id>/', views.export_subcounty_accounts_csv, name='export_subcounty_accounts_csv'),
     path('bulk-upload/', views.bulk_upload_accounts, name='bulk_upload_accounts'),
+    path('export_dashboards/', views.export_dashboards_csv, name='export_dashboards_csv'),
+    path('export_dashboards/<int:county_id>/', views.export_dashboards_csv, name='export_dashboards_csv_by_county'),
    
    
 ]
