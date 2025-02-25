@@ -166,7 +166,14 @@ def county_detail(request, county_id):
 
 def subcounty_detail(request, subcounty_id):
     subcounty = get_object_or_404(Subcounty, id=subcounty_id)
-    accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
+    # accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
+    accounts = Accounts.objects.filter(account_subcounty=subcounty)
+    
+
+    
+    # print("Subcounty:", subcounty)
+    # print("Fetched accounts:", accounts)
+
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
 
@@ -211,6 +218,7 @@ def export_accounts_csv(request):
 
     return response
 
+
 def bulk_upload_accounts(request):
     if request.method == "POST":
         form = AccountUploadForm(request.POST, request.FILES)
@@ -229,12 +237,28 @@ def bulk_upload_accounts(request):
             error_count = 0
             duplicate_usernames = set()
             duplicate_uuids = set()
+            invalid_subcounties = set()
+            invalid_counties = set()
 
             for row in reader:
                 try:
-                    name, contact_uuid,area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
+                    name, contact_uuid, area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
 
-                    # Check if username or contact_uuid already exists
+                    # Check if county exists
+                    try:
+                        county = County.objects.get(name=county_name)
+                    except County.DoesNotExist:
+                        invalid_counties.add(county_name)
+                        continue  # Skip this row
+
+                    # Check if subcounty exists under the given county
+                    try:
+                        subcounty = Subcounty.objects.get(name=subcounty_name, subcounty_county=county)
+                    except Subcounty.DoesNotExist:
+                        invalid_subcounties.add(subcounty_name)
+                        continue  # Skip this row
+
+                    # Check for duplicate username or contact_uuid
                     if Accounts.objects.filter(Username=username).exists():
                         duplicate_usernames.add(username)
                         continue  # Skip this row
@@ -243,10 +267,12 @@ def bulk_upload_accounts(request):
                         duplicate_uuids.add(contact_uuid)
                         continue  # Skip this row
 
-                    # Get or create related objects
+                    if Accounts.objects.filter(Area_UUID=area_uuid).exists():
+                        duplicate_uuids.add(area_uuid)
+                        continue  # Skip this row
+
+                    # Get or create category
                     category, _ = Category.objects.get_or_create(name=category_name)
-                    county, _ = County.objects.get_or_create(name=county_name)
-                    subcounty, _ = Subcounty.objects.get_or_create(name=subcounty_name, subcounty_county=county)
 
                     # Create account
                     Accounts.objects.create(
@@ -266,13 +292,22 @@ def bulk_upload_accounts(request):
                     print(f"Error importing row: {row} - {str(e)}")
                     error_count += 1
 
-            # Display messages
+            # Display error messages for invalid entries
+            if invalid_subcounties:
+                messages.error(request, f"Invalid subcounties: {', '.join(invalid_subcounties)}. Please correct them and try again.")
+            if invalid_counties:
+                messages.error(request, f"Invalid counties: {', '.join(invalid_counties)}. Please correct them and try again.")
             if duplicate_usernames:
                 messages.warning(request, f"Skipped {len(duplicate_usernames)} duplicate usernames: {', '.join(duplicate_usernames)}.")
             if duplicate_uuids:
                 messages.warning(request, f"Skipped {len(duplicate_uuids)} duplicate Contact UUIDs: {', '.join(duplicate_uuids)}.")
 
-            messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
+            # Show success message if any accounts were imported
+            if success_count > 0:
+                messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
+            else:
+                messages.error(request, "No valid accounts were imported. Please check errors and try again.")
+
             return redirect('bulk_upload_accounts')
 
     else:
@@ -287,7 +322,7 @@ def export_subcounty_accounts_csv(request, subcounty_id):
     response['Content-Disposition'] = f'attachment; filename="subcounty_{subcounty_id}_accounts.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
+    writer.writerow(['Name', 'Contact UUID','Area UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
     try:
@@ -301,6 +336,7 @@ def export_subcounty_accounts_csv(request, subcounty_id):
         writer.writerow([
             account.Name, 
             account.Contact_UUID, 
+            account.Area_UUID,
             account.Community_Health_Unit, 
             account.Username,
             account.Password,
@@ -311,6 +347,43 @@ def export_subcounty_accounts_csv(request, subcounty_id):
 
     return response
  
+@login_required(login_url='/login/')
+def export_dashboards_csv(request, county_id=None):
+    """
+    Exports dashboard data as a CSV file.
+    If a county_id is provided, only dashboards from that county are included.
+    """
+    if county_id:
+        try:
+            county = County.objects.get(id=county_id)
+            dashboards = Dashboards.objects.filter(account_county=county)
+            filename = f"dashboards_{county.name}.csv"
+        except County.DoesNotExist:
+            return HttpResponse("County not found.", status=404)
+    else:
+        dashboards = Dashboards.objects.all()
+        filename = "all_dashboards.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Name", "Role", "Community Health Unit", "Username", "Password", "Subcounty", "County"])
+
+    for dashboard in dashboards:
+        writer.writerow([
+            dashboard.Name, 
+            dashboard.Role,
+            dashboard.Community_Health_Unit,
+            dashboard.Username,
+            dashboard.Password,
+            dashboard.account_subcounty.name,
+            dashboard.account_county.name,
+            # dashboard.pub_date.strftime('%Y-%m-%d %H:%M')
+        ])
+
+    return response
+
 def signout(request):
     logout(request)
     messages.success(request,"You have logged out")
