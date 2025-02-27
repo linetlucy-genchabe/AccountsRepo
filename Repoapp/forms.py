@@ -11,6 +11,13 @@ class NewAccountForm(forms.ModelForm):
           'account': forms.Textarea(attrs={'rows':2, 'cols':10,}),
         }
 
+class NewLmsaccountForm(forms.ModelForm):
+    class Meta:
+        model = Lmsaccounts
+        exclude = ['Author', 'pub_date', 'author_profile','admin_profile', ]
+        widgets = {
+          'account': forms.Textarea(attrs={'rows':2, 'cols':10,}),
+        }
 
 class NewDashboardAccountForm(forms.ModelForm):
     class Meta:
