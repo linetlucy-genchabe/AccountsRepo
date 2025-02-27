@@ -6,7 +6,7 @@
 
     <div class="jumbotron jumbotron-fluid bg-white pb-3 pt-4 shadow" style="margin-top: 1%;">
             
-       <h1 class="display-5 text-center font-weight-bold" style="color: rgb(40, 15, 179);">Add a new LMS Account </h1>
+       <h1 class="display-5 text-center font-weight-bold" style="color: rgb(40, 15, 179);">Edit Lms Account </h1>
     
     </div>      
 <div class="container">
@@ -15,20 +15,17 @@
       <div class="col-lg-3"></div>
 
       <div class="col-lg-6 pt-2 shadow" style=" padding-bottom:1%;margin-top: 1%;margin-bottom: 1%;">
-            <form  action="{%url 'new-lmsaccount'%}" method="post" style="padding-top: 3%;" enctype="multipart/form-data">
+            <form  action="" method="post" style="padding-top: 3%;" enctype="multipart/form-data">
               {%csrf_token%}
 
-              {% bootstrap_form form5 %}
+              {% bootstrap_form form6%}
               
-              <input type="submit" class="btn btn-outline-info btn-lg font-weight-bold" value="SUBMIT">
+              <input type="submit" class="btn btn-info btn-lg font-weight-bold" value="UPDATE DETAILS">
             </form>
       </div>
 
       <div class="col-lg-3"></div>
     
   </div>
-  <!-- <a href="{% url 'bulk_upload_accounts' %}" class="btn btn-outline-primary">Bulk Upload Dashboard Accounts</a> -->
-
-  
 </div>
 {% endblock %}

@@ -50,9 +50,9 @@
                 Download CSV
             </button>
             <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
-                <li><a class="dropdown-item" href="{% url 'export_dashboards_csv' %}">All Counties</a></li>
+                <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv' %}">All Counties</a></li>
                 {% for county in counties %}
-                    <li><a class="dropdown-item" href="{% url 'export_dashboards_csv_by_county' county.id %}">{{ county.name }}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv_by_county' county.id %}">{{ county.name }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -68,7 +68,7 @@
         <td><b>{{lmsaccount.account_subcounty}}</b></td>
         <td><b>{{lmsaccount.Name}}</b></td>
         <!-- <td><b>{{lmsaccount.Role}}</b></td> -->
-        <td><b>{{dashboard.Community_Health_Unit}}</b></td>
+        <td><b>{{lmsaccount.Community_Health_Unit}}</b></td>
         <!-- <td><b>{{dashboard.Contact_UUID}}</b></td> -->
         <td><b>{{lmsaccount.Username}}</b></td>
         <td><b>{{lmsaccount.Password}}</b></td>

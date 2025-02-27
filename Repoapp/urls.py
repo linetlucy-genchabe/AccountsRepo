@@ -19,12 +19,15 @@ urlpatterns = [
     url(r'^search/', views.search_accounts, name='search_results'),
     url(r'^profile/$', views.user_profiles, name='profile'),
     path('update-account/<int:id>', views.update_account, name="update-account"),
+    path('update-lmsaccount/<int:id>', views.update_lmsaccount, name="update-lmsaccount"),
     path('update-dashboard/<int:id>', views.update_dashboard, name="update-dashboard"),
     url(r'export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
     path('export-accounts/subcounty/<int:subcounty_id>/', views.export_subcounty_accounts_csv, name='export_subcounty_accounts_csv'),
     path('bulk-upload/', views.bulk_upload_accounts, name='bulk_upload_accounts'),
     path('export_dashboards/', views.export_dashboards_csv, name='export_dashboards_csv'),
+    path('export_lmsaccounts/', views.export_lmsaccounts_csv, name='export_lmsaccounts_csv'),
     path('export_dashboards/<int:county_id>/', views.export_dashboards_csv, name='export_dashboards_csv_by_county'),
+    path('export_lmsaccounts/<int:county_id>/', views.export_lmsaccounts_csv, name='export_lmsaccounts_csv_by_county'),
    
    
 ]

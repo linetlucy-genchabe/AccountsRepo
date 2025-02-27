@@ -112,7 +112,7 @@ def new_lmsaccount(request):
 
     else:
         form5 = NewLmsaccountForm()
-    return render(request, 'new_account.html', {"form5": form5})
+    return render(request, 'new_lmsaccount.html', {"form5": form5})
 
 @login_required(login_url='/login/')
 def update_account(request,id):
@@ -143,6 +143,20 @@ def update_dashboard(request,id):
         form3 = DashboardUpdateForm(instance=update)
     return render(request, 'edit_dashboard.html', {'form3': form3})
 
+
+@login_required(login_url='/login/')
+def update_lmsaccount(request,id):
+    
+    update = Lmsaccounts.objects.get(id=id)
+    if request.method == 'POST':
+        form6= LmsaccountUpdateForm(
+            request.POST, request.FILES, instance=update)
+        if form6.is_valid():
+            form6.save()
+            return redirect(lmsaccounts)
+    else:
+        form6 = LmsaccountUpdateForm(instance=update)
+    return render(request, 'edit_lmsaccount.html', {'form6': form6})
 
 @login_required(login_url='/login/')
 def search_accounts(request):
@@ -410,6 +424,44 @@ def export_dashboards_csv(request, county_id=None):
         ])
 
     return response
+
+
+@login_required(login_url='/login/')
+def export_lmsaccounts_csv(request, county_id=None):
+    """
+    Exports lmsaccounts data as a CSV file.
+    If a county_id is provided, only lmsaccounts from that county are included.
+    """
+    if county_id:
+        try:
+            county = County.objects.get(id=county_id)
+            lmsaccounts = Lmsaccounts.objects.filter(account_county=county)
+            filename = f"lmsaccounts_{county.name}.csv"
+        except County.DoesNotExist:
+            return HttpResponse("County not found.", status=404)
+    else:
+        lmsaccounts = Lmsaccounts.objects.all()
+        filename = "all_lmsaccounts.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Name", "Community Health Unit", "Username", "Password", "Subcounty", "County"])
+
+    for lmsaccount in lmsaccounts:
+        writer.writerow([
+            lmsaccount.Name, 
+            lmsaccount.Community_Health_Unit,
+            lmsaccount.Username,
+            lmsaccount.Password,
+            lmsaccount.account_subcounty.name,
+            lmsaccount.account_county.name,
+            # dashboard.pub_date.strftime('%Y-%m-%d %H:%M')
+        ])
+
+    return response
+
 
 def signout(request):
     logout(request)
