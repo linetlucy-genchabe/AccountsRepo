@@ -29,6 +29,12 @@ def dashboards(request):
 
     return render(request, 'dashboards.html', {"dashboards":dashboards, 'counties':counties})
 
+def lmsaccounts(request):
+    lmsaccounts = Lmsaccounts.objects.all()
+    counties = County.objects.all()
+
+    return render(request, 'lmsaccounts.html', {"lmsaccounts":lmsaccounts, 'counties':counties})
+
 def user_login(request):
     if request.method =='POST':
         username = request.POST['username']
@@ -86,6 +92,27 @@ def new_dashboard(request):
     else:
         form4 = NewDashboardAccountForm()
     return render(request, 'new_dashboard.html', {"form4": form4})
+
+
+@login_required(login_url='/login/')
+def new_lmsaccount(request):
+    current_user = request.user
+    profile = request.user.profile
+   
+
+    if request.method == 'POST':
+        form = NewLmsaccountForm(request.POST, request.FILES)
+        if form.is_valid():
+            lmsaccount = form.save(commit=False)
+            lmsaccount.Author = current_user
+            lmsaccount.author_profile = profile
+
+            lmsaccount.save()
+        return redirect('lmsaccounts')
+
+    else:
+        form5 = NewLmsaccountForm()
+    return render(request, 'new_account.html', {"form5": form5})
 
 @login_required(login_url='/login/')
 def update_account(request,id):
