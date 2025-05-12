@@ -21,6 +21,7 @@ class Category(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
+    role = models.CharField(max_length=100, default='RDHSO')
     # description = models.TextField(blank=True)
     # Use roles to check if user is authorised to edit
     
