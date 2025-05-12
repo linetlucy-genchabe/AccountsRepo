@@ -28,61 +28,49 @@
               <div class="col-md-"></div>
           <div class="col-md-12" style="float: left;display:flex;">
            {% if lmsaccounts %}
-   <table class="table">
-    
-    <thead>
-       
-      <tr>
-         <!-- <th scope="col">#</th>  -->
-         <th scope="col">County</th>
-        <th scope="col">Subcounty</th>
-        <th scope="col">Name</th>
-        <!-- <th scope="col">Role</th> -->
-        <th scope="col">Community_Health_Unit</th>
-        <!-- <th scope="col">Contact UUID</th> -->
-        <th scope="col">Username</th>
-        <th scope="col">Password</th>
-        <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-      <th>
-
-        <div class="dropdown">
-            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                Download CSV
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
-                <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv' %}">All Counties</a></li>
-                {% for county in counties %}
-                    <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv_by_county' county.id %}">{{ county.name }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-      </th>
-      </tr>
-    </thead>
-    
-    <tbody>
-        {% for lmsaccount in lmsaccounts %}
-      <tr>
-        <!-- <th scope="row">1</th> -->
-        <td><b>{{lmsaccount.account_county}}</b></td>
-        <td><b>{{lmsaccount.account_subcounty}}</b></td>
-        <td><b>{{lmsaccount.Name}}</b></td>
-        <!-- <td><b>{{lmsaccount.Role}}</b></td> -->
-        <td><b>{{lmsaccount.Community_Health_Unit}}</b></td>
-        <!-- <td><b>{{dashboard.Contact_UUID}}</b></td> -->
-        <td><b>{{lmsaccount.Username}}</b></td>
-        <td><b>{{lmsaccount.Password}}</b></td>
-        
-
-        <td>
-             <a role="button" class="btn btn-sm btn-outline-info"  
-                 href="{% url 'update-lmsaccount' lmsaccount.id%}">Edit</a>  
-        </td>
- 
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+           <div class="table-responsive" style="font-size: 0.75rem;">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">County</th>
+                        <th scope="col">Subcounty</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Community_Health_Unit</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Password</th>
+                        <th>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Download CSV
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv' %}">All Counties</a></li>
+                                    {% for county in counties %}
+                                        <li><a class="dropdown-item" href="{% url 'export_lmsaccounts_csv_by_county' county.id %}">{{ county.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lmsaccount in lmsaccounts %}
+                        <tr>
+                            <td><b>{{ lmsaccount.account_county }}</b></td>
+                            <td><b>{{ lmsaccount.account_subcounty }}</b></td>
+                            <td><b>{{ lmsaccount.Name }}</b></td>
+                            <td><b>{{ lmsaccount.Community_Health_Unit }}</b></td>
+                            <td><b>{{ lmsaccount.Username }}</b></td>
+                            <td><b>{{ lmsaccount.Password }}</b></td>
+                            <td>
+                                <a role="button" class="btn btn-sm btn-outline-info" href="{% url 'update-lmsaccount' lmsaccount.id %}">Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+          
   
           </div>
              

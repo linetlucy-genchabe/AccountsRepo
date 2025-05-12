@@ -58,64 +58,55 @@
               <div class="col-md-"></div>
           <div class="col-md-12" style="float: left;display:flex;">
            {% if accounts %}
-   <table class="table">
-    
-    <thead>
-       
-      <tr>
-         <!-- <th scope="col">#</th>  -->
-        <th scope="col">Subcounty</th>
-        <th scope="col">Name</th>
-        <th scope="col">Community_Health_Unit</th>
-        <th scope="col">Contact UUID</th>
-        <th scope="col">Area UUID</th>
-        <th scope="col">Username</th>
-        <th scope="col">Password</th>
-        <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-        <th><div class="dropdown">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Download
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}">Download All Accounts</a></li>
-              
-              <!-- County-based download -->
-              {% for county in counties %}
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?county={{ county.id }}">{{ county.name }} Accounts</a></li>
-              {% endfor %}
-      
-              <!-- Subcounty-based download -->
-              {% for subcounty in subcounties %}
-              <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?subcounty={{ subcounty.id }}">{{ subcounty.name }} Accounts</a></li>
-              {% endfor %}
-          </ul>
-      </div></th>
-      
-      </tr>
-    </thead>
-    
-    <tbody>
-        {% for account in accounts %}
-      <tr>
-        <!-- <th scope="row">1</th> -->
-        <td><b>{{account.account_subcounty}}</b></td>
-        <td><b>{{account.Name}}</b></td>
-        <td><b>{{account.Community_Health_Unit}}</b></td>
-        <td><b>{{account.Contact_UUID}}</b></td>
-        <td><b>{{account.Area_UUID}}</b></td>
-        <td><b>{{account.Username}}</b></td>
-        <td><b>{{account.Password}}</b></td>
-        
-
-        <td>
-             <a role="button" class="btn btn-sm btn-outline-info"  
-                 href="{% url 'update-account' account.id%}">Edit</a>  
-        </td>
- 
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+           <div class="table-responsive" style="font-size: 0.75rem;">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Subcounty</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Community_Health_Unit</th>
+                        <th scope="col">Contact UUID</th>
+                        <th scope="col">Area UUID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Password</th>
+                        <th>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Download
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}">Download All Accounts</a></li>
+                                    {% for county in counties %}
+                                        <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?county={{ county.id }}">{{ county.name }} Accounts</a></li>
+                                    {% endfor %}
+                                    {% for subcounty in subcounties %}
+                                        <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?subcounty={{ subcounty.id }}">{{ subcounty.name }} Accounts</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                        <tr>
+                            <td><b>{{ account.account_subcounty }}</b></td>
+                            <td><b>{{ account.Name }}</b></td>
+                            <td><b>{{ account.Community_Health_Unit }}</b></td>
+                            <td><b>{{ account.Contact_UUID }}</b></td>
+                            <td><b>{{ account.Area_UUID }}</b></td>
+                            <td><b>{{ account.Username }}</b></td>
+                            <td><b>{{ account.Password }}</b></td>
+                            <td>
+                                <a role="button" class="btn btn-sm btn-outline-info" href="{% url 'update-account' account.id %}">Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+                
+   
   
           </div>
              
