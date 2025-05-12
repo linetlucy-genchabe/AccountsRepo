@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.templatetags.static import static
 # from django.shortcuts import render, redirect, render_to_response, HttpResponseRedirect
-from django.http import HttpResponse, Http404,HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseForbidden,HttpResponseRedirect
 import datetime as dt
 from .models import *
 from .forms import *
@@ -147,6 +147,13 @@ def update_dashboard(request,id):
 @login_required(login_url='/login/')
 def update_lmsaccount(request,id):
     
+    profile = request.user.profile
+
+    # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to add dashboards.")
+        return redirect('lmsaccounts')
+
     update = Lmsaccounts.objects.get(id=id)
     if request.method == 'POST':
         form6= LmsaccountUpdateForm(
