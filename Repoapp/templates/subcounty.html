@@ -26,50 +26,39 @@
         
         
 
-           <table class="table">
-    
-            <thead>
-               
+        <div class="table-responsive" style="font-size: 0.85rem;">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-primary">
               <tr>
-                 <!-- <th scope="col">#</th>  -->
                 <th scope="col">Subcounty</th>
                 <th scope="col">Name</th>
-                <th scope="col">Community_Health_Unit</th>
+                <th scope="col">Community Health Unit</th>
                 <th scope="col">Contact UUID</th>
                 <th scope="col">Area UUID</th>
                 <th scope="col">Username</th>
                 <th scope="col">Password</th>
-                <!-- <th><a href="{% url 'export_accounts_csv' %}" class="btn btn-outline-primary" >Download</a></th> -->
-                <!-- <th><a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn btn-outline-primary">
-                  Download {{ subcounty.name }} Accounts
-              </a>
-              </th> -->
-               
+                
               </tr>
             </thead>
             
             <tbody>
-                {% for account in accounts %}
+              {% for account in accounts %}
               <tr>
-                <!-- <th scope="row">1</th> -->
-                <td><b>{{account.account_subcounty}}</b></td>
-                <td><b>{{account.Name}}</b></td>
-                <td><b>{{account.Community_Health_Unit}}</b></td>
-                <td><b>{{account.Contact_UUID}}</b></td>
-                <td><b>{{account.Area_UUID}}</b></td>
-                <td><b>{{account.Username}}</b></td>
-                <td><b>{{account.Password}}</b></td>
+                <td><b>{{ account.account_subcounty }}</b></td>
+                <td><b>{{ account.Name }}</b></td>
+                <td><b>{{ account.Community_Health_Unit }}</b></td>
+                <td><b>{{ account.Contact_UUID }}</b></td>
+                <td><b>{{ account.Area_UUID }}</b></td>
+                <td><b>{{ account.Username }}</b></td>
+                <td><b>{{ account.Password }}</b></td>
                 
-        
-                <td>
-                     <a role="button" class="btn btn-sm btn-outline-info"  
-                         href="{% url 'update-account' account.id%}">Edit</a>  
                 </td>
-         
               </tr>
               {% endfor %}
             </tbody>
           </table>
+        </div>
+        
           
         {% else %}
             <li>No accounts available</li>
