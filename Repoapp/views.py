@@ -56,7 +56,11 @@ def user_login(request):
 def new_account(request):
     current_user = request.user
     profile = request.user.profile
-   
+
+   # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to add account.")
+        return redirect('index')
 
     if request.method == 'POST':
         form = NewAccountForm(request.POST, request.FILES)
@@ -77,7 +81,11 @@ def new_account(request):
 def new_dashboard(request):
     current_user = request.user
     profile = request.user.profile
-   
+
+   # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to add account.")
+        return redirect('dashboards')
 
     if request.method == 'POST':
         form = NewDashboardAccountForm(request.POST, request.FILES)
@@ -99,6 +107,10 @@ def new_lmsaccount(request):
     current_user = request.user
     profile = request.user.profile
    
+    # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to add account.")
+        return redirect('lmsaccounts')
 
     if request.method == 'POST':
         form = NewLmsaccountForm(request.POST, request.FILES)
@@ -117,6 +129,13 @@ def new_lmsaccount(request):
 @login_required(login_url='/login/')
 def update_account(request,id):
     
+    profile = request.user.profile
+
+    # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to update account.")
+        return redirect('index')
+    
     update = Accounts.objects.get(id=id)
     if request.method == 'POST':
         form2= AccountUpdateForm(
@@ -131,6 +150,12 @@ def update_account(request,id):
 
 @login_required(login_url='/login/')
 def update_dashboard(request,id):
+    profile = request.user.profile
+
+    # Check if user has permission to add accounts
+    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+        messages.error(request, "You do not have permission to update account.")
+        return redirect('dashboards')
     
     update = Dashboards.objects.get(id=id)
     if request.method == 'POST':
@@ -151,7 +176,7 @@ def update_lmsaccount(request,id):
 
     # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to add dashboards.")
+        messages.error(request, "You do not have permission to update account.")
         return redirect('lmsaccounts')
 
     update = Lmsaccounts.objects.get(id=id)
