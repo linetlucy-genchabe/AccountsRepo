@@ -202,6 +202,19 @@ def search_accounts(request):
     else:
         message = "You haven't searched for any term"
         return render(request, 'search.html', {"message": message})
+    
+@login_required(login_url='/login/')
+def search_lmsaccounts(request):
+    if 'keyword' in request.GET and request.GET["keyword"]:
+        search_term = request.GET.get("keyword")
+        searched_projects = Lmsaccounts.search_accounts(search_term)
+        message = f"{search_term}"
+
+        return render(request, 'search.html', {"message":message,"lmsaccounts": searched_projects})
+
+    else:
+        message = "You haven't searched for any term"
+        return render(request, 'search.html', {"message": message})
 
 @login_required(login_url='/login/')
 def user_profiles(request):
