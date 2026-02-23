@@ -272,6 +272,7 @@ def subcounty_detail(request, subcounty_id):
 
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
+
 def country_detail(request, country_id):
     country = get_object_or_404(Countries, id=country_id)
     profile = request.user.profile
@@ -284,7 +285,7 @@ def country_detail(request, country_id):
             return redirect('index')
 
     counties = country.counties.all()
-    return render(request, 'country.html', {'country': country, 'counties': counties})
+    return render(request, 'countries.html', {'country': country, 'counties': counties})
     
     # print("Subcounty:", subcounty)
     # print("Fetched accounts:", accounts)
