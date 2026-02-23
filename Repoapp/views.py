@@ -22,19 +22,31 @@ def index(request):
     countries = Countries.objects.all()
 
     return render(request, 'index.html', {"accounts":accounts, 'counties':counties, 'countries': countries})
-
-
+@login_required(login_url='/login/')
 def dashboards(request):
+    profile = request.user.profile
+    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
+    
+    if profile.role not in FULL_ACCESS_ROLES:
+        messages.error(request, "You do not have permission to view dashboards.")
+        return redirect('index')
+    
     dashboards = Dashboards.objects.all()
     counties = County.objects.all()
+    return render(request, 'dashboards.html', {"dashboards": dashboards, 'counties': counties})
 
-    return render(request, 'dashboards.html', {"dashboards":dashboards, 'counties':counties})
-
+@login_required(login_url='/login/')
 def lmsaccounts(request):
+    profile = request.user.profile
+    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
+    
+    if profile.role not in FULL_ACCESS_ROLES:
+        messages.error(request, "You do not have permission to view LMS accounts.")
+        return redirect('index')
+    
     lmsaccounts = Lmsaccounts.objects.all()
     counties = County.objects.all()
-
-    return render(request, 'lmsaccounts.html', {"lmsaccounts":lmsaccounts, 'counties':counties})
+    return render(request, 'lmsaccounts.html', {"lmsaccounts": lmsaccounts, 'counties': counties})
 
 def user_login(request):
     if request.method =='POST':
