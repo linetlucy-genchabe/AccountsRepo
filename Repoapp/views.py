@@ -255,17 +255,18 @@ def subcounty_detail(request, subcounty_id):
     subcounty = get_object_or_404(Subcounty, id=subcounty_id)
     # accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
+    return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
 def country_detail(request, country_id):
     country = get_object_or_404(Countries, id=country_id)
     counties = country.counties.all()  # Gets counties linked to this country
-    return render(request, 'country.html', {'country': country, 'counties': counties})  
+    return render(request, 'countries.html', {'country': country, 'counties': counties})  
 
     
     # print("Subcounty:", subcounty)
     # print("Fetched accounts:", accounts)
 
-    return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
+
 
 
 def export_accounts_csv(request):

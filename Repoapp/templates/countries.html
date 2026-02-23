@@ -1,0 +1,38 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ country.name }} - Counties</h1>
+        <hr>
+
+    <ul class="counties" style="align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style-type: none;
+    padding-left: 0px;">
+        {% for county in counties %}
+        <a href="{% url 'county_detail' county.id %}" style="background-color: rgb(207, 246, 246);
+        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
+        font-size: 35px;
+        margin: 35px;
+        padding: 20px;
+        text-align: center; text-decoration: none;">{{county.name}} Credentials</a>
+
+        {% empty %}
+            <li>No counties available</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'index' %}" style="margin-top: 3%;">Back to Countries</a>
+
+</div>
+</body>
+
+{%endblock%}
