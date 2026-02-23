@@ -60,3 +60,13 @@ class ProfileUpdateForm(forms.ModelForm):
         }
 class AccountUploadForm(forms.Form):
     file = forms.FileField(label="Upload CSV File")
+
+class CountyUpdateForm(forms.ModelForm):
+    class Meta:
+        model = County
+        fields = ['name', 'county_country']
+
+class SubcountyUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Subcounty
+        fields = ['name', 'subcounty_county']

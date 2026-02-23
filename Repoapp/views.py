@@ -266,7 +266,30 @@ def country_detail(request, country_id):
     # print("Subcounty:", subcounty)
     # print("Fetched accounts:", accounts)
 
+@login_required(login_url='/login/')
+def update_county(request, id):
+    county = get_object_or_404(County, id=id)
+    if request.method == 'POST':
+        form = CountyUpdateForm(request.POST, instance=county)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = CountyUpdateForm(instance=county)
+    return render(request, 'edit_county.html', {'form': form})
 
+
+@login_required(login_url='/login/')
+def update_subcounty(request, id):
+    subcounty = get_object_or_404(Subcounty, id=id)
+    if request.method == 'POST':
+        form = SubcountyUpdateForm(request.POST, instance=subcounty)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = SubcountyUpdateForm(instance=subcounty)
+    return render(request, 'edit_subcounty.html', {'form': form})
 
 
 def export_accounts_csv(request):

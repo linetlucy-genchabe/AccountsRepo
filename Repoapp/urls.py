@@ -29,6 +29,8 @@ urlpatterns = [
     path('export_lmsaccounts/', views.export_lmsaccounts_csv, name='export_lmsaccounts_csv'),
     path('export_dashboards/<int:county_id>/', views.export_dashboards_csv, name='export_dashboards_csv_by_county'),
     path('export_lmsaccounts/<int:county_id>/', views.export_lmsaccounts_csv, name='export_lmsaccounts_csv_by_county'),
+    path('update-county/<int:id>/', views.update_county, name='update-county'),
+    path('update-subcounty/<int:id>/', views.update_subcounty, name='update-subcounty'),
    
    
 ]

@@ -77,6 +77,11 @@ class County(models.Model):
     def save_county(self):
         self.save()
 
+    def update_county(self, name, country):
+        self.name = name
+        self.county_country = country
+        self.save()
+
 class Subcounty(models.Model):
     name = models.CharField(max_length=50, unique=True)
     subcounty_county=models.ForeignKey(County,on_delete=models.CASCADE,related_name="subcounty")
@@ -86,6 +91,11 @@ class Subcounty(models.Model):
 
 
     def save_subcounty(self):
+        self.save()
+
+    def update_subcounty(self, name, county):
+        self.name = name
+        self.subcounty_county = county
         self.save()
 
         
