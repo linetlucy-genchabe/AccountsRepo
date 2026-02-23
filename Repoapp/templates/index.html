@@ -11,7 +11,29 @@
     <div class="container">
       <div class="row">
         
-      
+                {% if countries %}
+<h1 style="color: rgb(16, 16, 155);">Countries</h1>
+<div class="row">
+  {% for country in countries %}
+  <div class="col-md-6">
+    <ul style="align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style-type: none;
+    padding-left: 0px;">
+      <a href="{% url 'country_detail' country.id %}" style="background-color: rgb(207, 246, 246);
+      box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
+      font-size: 35px;
+      margin: 35px;
+      padding: 20px;
+      text-align: center; text-decoration: none;">{{country.name}} Credentials</a>
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+<hr>
+{% endif %} 
       
       
           {% if counties %}
@@ -54,7 +76,7 @@
     {% endfor %}
   </div>
 {% endif %}
-      <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All eCHIS Accounts </h1>
+      <!-- <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All eCHIS Accounts </h1>
       
         <a class="nav-link font-weight-bold" href="{%url 'new-account'%}" style="color: rgb(7, 5, 132);"> ADD NEW ACCOUNT </a>
       
@@ -118,7 +140,7 @@
                 
    
   
-          </div>
+          </div> -->
              
               {% endif %}
             </div>

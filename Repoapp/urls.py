@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^new/dashboard$', views.new_dashboard, name='new-dashboard'),
     url(r'^new/lmsaccount$', views.new_lmsaccount, name='new-lmsaccount'),
     path('county/', views.county, name='county'),
+    path('country/<int:country_id>/', views.country_detail, name='country_detail'),
     path('dashboards/', views.dashboards, name='dashboards'),
     path('lmsaccounts/', views.lmsaccounts, name='lmsaccounts'),
     path('county/<int:county_id>/', views.county_detail, name='county_detail'),

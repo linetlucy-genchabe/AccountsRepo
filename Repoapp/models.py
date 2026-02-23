@@ -44,9 +44,31 @@ class Profile(models.Model):
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
 
+class Countries(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=10, unique=True, blank=True, null=True)  # e.g. KE, UG, TZ
+
+    def __str__(self):
+        return self.name
+
+    def save_countries(self):
+        self.save()
+
+    def delete_countries(self):
+        self.delete()
+
+    @classmethod
+    def get_allcountries(cls):
+        return cls.objects.all()
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Country'
+        verbose_name_plural = 'Countries'
+
 class County(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    
+    county_country = models.ForeignKey(Countries, on_delete=models.CASCADE, related_name="counties", null=True, blank=True)
     
     def __str__(self):
         return self.name

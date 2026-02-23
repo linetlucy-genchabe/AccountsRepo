@@ -19,8 +19,9 @@ import json
 def index(request):
     accounts = Accounts.objects.all()
     counties = County.objects.all()
+    countries = Countries.objects.all()
 
-    return render(request, 'index.html', {"accounts":accounts, 'counties':counties})
+    return render(request, 'index.html', {"accounts":accounts, 'counties':counties, 'countries': countries})
 
 
 def dashboards(request):
@@ -254,7 +255,11 @@ def subcounty_detail(request, subcounty_id):
     subcounty = get_object_or_404(Subcounty, id=subcounty_id)
     # accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
-    
+
+def country_detail(request, country_id):
+    country = get_object_or_404(Countries, id=country_id)
+    counties = country.counties.all()  # Gets counties linked to this country
+    return render(request, 'country.html', {'country': country, 'counties': counties})  
 
     
     # print("Subcounty:", subcounty)
