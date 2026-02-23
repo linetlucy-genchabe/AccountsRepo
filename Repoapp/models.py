@@ -18,31 +18,6 @@ class Category(models.Model):
     def save_category(self):
         self.save()
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    role = models.CharField(max_length=100, default='RDHSO')
-    # description = models.TextField(blank=True)
-    # Use roles to check if user is authorised to edit
-    
-
-    def save_profile(self):
-        self.save()
-        
-        
-
-    def delete_profile(self):
-        self.delete()
-
-    def __str__(self):
-        return str(self.user)
-    
-    # def __str__(self):
-    #     return f"{self.user}, {self.bio}, {self.photo}"
-    
-    class Meta:
-        verbose_name = 'Profile'
-        verbose_name_plural = 'Profiles'
 
 class Countries(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -98,6 +73,35 @@ class Subcounty(models.Model):
         self.subcounty_county = county
         self.save()
 
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+    role = models.CharField(max_length=100, default='RDHSO')
+    allowed_countries = models.ManyToManyField(Countries, blank=True, related_name='allowed_users')
+    allowed_counties = models.ManyToManyField(County, blank=True, related_name='allowed_users')
+    allowed_subcounties = models.ManyToManyField(Subcounty, blank=True, related_name='allowed_users')
+    # description = models.TextField(blank=True)
+    # Use roles to check if user is authorised to edit
+    
+
+    def save_profile(self):
+        self.save()
+        
+        
+
+    def delete_profile(self):
+        self.delete()
+
+    def __str__(self):
+        return str(self.user)
+    
+    # def __str__(self):
+    #     return f"{self.user}, {self.bio}, {self.photo}"
+    
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
         
 class Accounts(models.Model):
     Name = models.CharField(max_length=255)
@@ -308,3 +312,4 @@ class Lmsaccounts(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'My lmsaccounts'
         verbose_name_plural = 'lmsaccounts'
+

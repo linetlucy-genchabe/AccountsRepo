@@ -56,7 +56,10 @@ class ProfileUpdateForm(forms.ModelForm):
         model = Profile
         exclude = ['user']
         widgets = {
-          'bio': forms.Textarea(attrs={'rows':2, 'cols':10,}),
+            'bio': forms.Textarea(attrs={'rows': 2, 'cols': 10}),
+            'allowed_countries': forms.CheckboxSelectMultiple(),
+            'allowed_counties': forms.CheckboxSelectMultiple(),
+            'allowed_subcounties': forms.CheckboxSelectMultiple(),
         }
 class AccountUploadForm(forms.Form):
     file = forms.FileField(label="Upload CSV File")

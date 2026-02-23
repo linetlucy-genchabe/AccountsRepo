@@ -248,20 +248,43 @@ def county(request):
 
 def county_detail(request, county_id):
     county = get_object_or_404(County, id=county_id)
-    subcounty = county.subcounty.all()  # Fetch subcounties for this county
+    profile = request.user.profile
+
+    # Superusers and Admins can see all counties
+    if profile.role not in ['Admin', 'Superuser']:
+        if not profile.allowed_counties.filter(id=county_id).exists():
+            messages.error(request, "You do not have permission to view this county.")
+            return redirect('index')
+
+    subcounty = county.subcounty.all()
     return render(request, 'county.html', {'county': county, 'subcounty': subcounty})
+
 
 def subcounty_detail(request, subcounty_id):
     subcounty = get_object_or_404(Subcounty, id=subcounty_id)
-    # accounts = subcounty.accountnames.all()  # Fetch accounts for this subcounty
+    profile = request.user.profile
+
+    # Superusers and Admins can see all subcounties
+    if profile.role not in ['Admin', 'Superuser']:
+        if not profile.allowed_subcounties.filter(id=subcounty_id).exists():
+            messages.error(request, "You do not have permission to view this subcounty.")
+            return redirect('index')
+
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
-
 def country_detail(request, country_id):
     country = get_object_or_404(Countries, id=country_id)
-    counties = country.counties.all()  # Gets counties linked to this country
-    return render(request, 'countries.html', {'country': country, 'counties': counties})  
+    profile = request.user.profile
 
+    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        if not profile.allowed_countries.filter(id=country_id).exists():
+            messages.error(request, "You do not have permission to view this country.")
+            return redirect('index')
+
+    counties = country.counties.all()
+    return render(request, 'country.html', {'country': country, 'counties': counties})
     
     # print("Subcounty:", subcounty)
     # print("Fetched accounts:", accounts)
