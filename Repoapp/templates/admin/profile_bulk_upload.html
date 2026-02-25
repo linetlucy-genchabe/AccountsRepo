@@ -1,0 +1,44 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+
+<h2>Bulk Upload Users</h2>
+
+<!-- Download template -->
+<p>
+    <a href="template/" class="button">⬇ Download CSV Template</a>
+</p>
+
+<!-- Upload form -->
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <label for="csv_file"><strong>Select CSV File:</strong></label><br><br>
+        <input type="file" name="csv_file" accept=".csv" required>
+    </div>
+    <br>
+    <button type="submit" class="button default">Upload Users</button>
+</form>
+
+<!-- CSV format guide -->
+<br>
+<h3>CSV Format Guide</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Column</th>
+            <th>Required</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>username</td><td>Yes</td><td>Must be unique</td></tr>
+        <tr><td>password</td><td>Yes</td><td>Plain text, will be hashed</td></tr>
+        <tr><td>email</td><td>No</td><td></td></tr>
+        <tr><td>role</td><td>No</td><td>Defaults to RDHSO</td></tr>
+        <tr><td>country</td><td>No</td><td>Comma separated e.g. Kenya,Uganda</td></tr>
+        <tr><td>counties</td><td>No</td><td>Comma separated e.g. Nairobi,Mombasa</td></tr>
+        <tr><td>subcounties</td><td>No</td><td>Comma separated e.g. Westlands,Nyali</td></tr>
+    </tbody>
+</table>
+
+{% endblock %}
