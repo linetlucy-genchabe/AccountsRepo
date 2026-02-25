@@ -83,53 +83,42 @@ class Profile(models.Model):
     allowed_subcounties = models.ManyToManyField(Subcounty, blank=True, related_name='allowed_users')
 
     def get_accessible_counties(self):
-        """Returns all counties the user can access."""
         accessible_counties = County.objects.none()
 
-        # Countries granted → all counties in those countries
         if self.allowed_countries.exists():
             accessible_counties = accessible_counties | County.objects.filter(
-                country__in=self.allowed_countries.all()
+                county_country__in=self.allowed_countries.all()
             )
 
-        # Explicit county grants
         if self.allowed_counties.exists():
             accessible_counties = accessible_counties | self.allowed_counties.all()
 
-        # Subcounty grants → expose the parent county too
         if self.allowed_subcounties.exists():
             accessible_counties = accessible_counties | County.objects.filter(
-                subcounties__in=self.allowed_subcounties.all()
+                subcounty__in=self.allowed_subcounties.all()
             )
 
         return accessible_counties.distinct()
 
     def get_accessible_subcounties(self):
-        """Returns all subcounties the user can access."""
         accessible_subcounties = Subcounty.objects.none()
 
-        # Countries granted → all subcounties in those countries
         if self.allowed_countries.exists():
             accessible_subcounties = accessible_subcounties | Subcounty.objects.filter(
-                county__country__in=self.allowed_countries.all()
+                subcounty_county__county_country__in=self.allowed_countries.all()
             )
 
-        # County grants → all subcounties under those counties
         if self.allowed_counties.exists():
             accessible_subcounties = accessible_subcounties | Subcounty.objects.filter(
-                county__in=self.allowed_counties.all()
+                subcounty_county__in=self.allowed_counties.all()
             )
 
-        # Explicit subcounty grants
         if self.allowed_subcounties.exists():
             accessible_subcounties = accessible_subcounties | self.allowed_subcounties.all()
 
         return accessible_subcounties.distinct()
 
     def get_accessible_accounts(self):
-        """Returns all accounts the user can access based on their permissions."""
-        from .models import Accounts  # avoid circular import if needed
-
         accessible_subcounties = self.get_accessible_subcounties()
         accessible_counties = self.get_accessible_counties()
 
