@@ -15,45 +15,52 @@ import csv
 from django.http import JsonResponse
 import json
 
+FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 
+@login_required(login_url='/login/')
 def index(request):
     profile = request.user.profile
-    
-    accounts = profile.get_accessible_accounts()
-    counties = profile.get_accessible_counties()
-    countries = profile.allowed_countries.all()
+
+    # Full access roles bypass all restrictions
+    if profile.role in FULL_ACCESS_ROLES:
+        accounts = Accounts.objects.all()
+        counties = County.objects.all()
+        countries = Countries.objects.all()
+    else:
+        accounts = profile.get_accessible_accounts()
+        counties = profile.get_accessible_counties()
+        countries = profile.allowed_countries.all()
 
     return render(request, 'index.html', {
         "accounts": accounts,
         "counties": counties,
         "countries": countries
     })
-
 @login_required(login_url='/login/')
 def dashboards(request):
     profile = request.user.profile
-    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
-    
+
     if profile.role not in FULL_ACCESS_ROLES:
         messages.error(request, "You do not have permission to view dashboards.")
         return redirect('index')
-    
+
     dashboards = Dashboards.objects.all()
     counties = County.objects.all()
     return render(request, 'dashboards.html', {"dashboards": dashboards, 'counties': counties})
 
+
 @login_required(login_url='/login/')
 def lmsaccounts(request):
     profile = request.user.profile
-    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
-    
+
     if profile.role not in FULL_ACCESS_ROLES:
         messages.error(request, "You do not have permission to view LMS accounts.")
         return redirect('index')
-    
+
     lmsaccounts = Lmsaccounts.objects.all()
     counties = County.objects.all()
     return render(request, 'lmsaccounts.html', {"lmsaccounts": lmsaccounts, 'counties': counties})
+
 
 def user_login(request):
     if request.method =='POST':
@@ -78,7 +85,7 @@ def new_account(request):
     profile = request.user.profile
 
    # Check if user has permission to add accounts
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
+    if profile.role not in ['RDHSO', 'Admin', 'UserManager', 'Superuser']:
         messages.error(request, "You do not have permission to add account.")
         return redirect('index')
 
@@ -257,6 +264,7 @@ def user_profiles(request):
 
 
     return render(request, 'profile.html', {"form":form})
+
 @login_required(login_url='/login/')
 
 def county(request):
@@ -265,13 +273,15 @@ def county(request):
 
     return render(request, 'index.html', {"counties":counties})
 
+@login_required(login_url='/login/')
 def county_detail(request, county_id):
     county = get_object_or_404(County, id=county_id)
     profile = request.user.profile
 
-    # Superusers and Admins can see all counties
-    if profile.role not in ['Admin', 'Superuser']:
-        if not profile.allowed_counties.filter(id=county_id).exists():
+    # Full access roles and users with country-level access can see all counties
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_counties = profile.get_accessible_counties()
+        if not accessible_counties.filter(id=county_id).exists():
             messages.error(request, "You do not have permission to view this county.")
             return redirect('index')
 
@@ -279,24 +289,24 @@ def county_detail(request, county_id):
     return render(request, 'county.html', {'county': county, 'subcounty': subcounty})
 
 
+@login_required(login_url='/login/')
 def subcounty_detail(request, subcounty_id):
     subcounty = get_object_or_404(Subcounty, id=subcounty_id)
     profile = request.user.profile
 
-    # Superusers and Admins can see all subcounties
-    if profile.role not in ['Admin', 'Superuser']:
-        if not profile.allowed_subcounties.filter(id=subcounty_id).exists():
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_subcounties = profile.get_accessible_subcounties()
+        if not accessible_subcounties.filter(id=subcounty_id).exists():
             messages.error(request, "You do not have permission to view this subcounty.")
             return redirect('index')
 
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
+@login_required(login_url='/login/')
 def country_detail(request, country_id):
     country = get_object_or_404(Countries, id=country_id)
     profile = request.user.profile
-
-    FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO']
 
     if profile.role not in FULL_ACCESS_ROLES:
         if not profile.allowed_countries.filter(id=country_id).exists():
@@ -305,9 +315,7 @@ def country_detail(request, country_id):
 
     counties = country.counties.all()
     return render(request, 'countries.html', {'country': country, 'counties': counties})
-    
-    # print("Subcounty:", subcounty)
-    # print("Fetched accounts:", accounts)
+
 
 @login_required(login_url='/login/')
 def update_county(request, id):
