@@ -17,11 +17,18 @@ import json
 
 
 def index(request):
-    accounts = Accounts.objects.all()
-    counties = County.objects.all()
-    countries = Countries.objects.all()
+    profile = request.user.profile
+    
+    accounts = profile.get_accessible_accounts()
+    counties = profile.get_accessible_counties()
+    countries = profile.allowed_countries.all()
 
-    return render(request, 'index.html', {"accounts":accounts, 'counties':counties, 'countries': countries})
+    return render(request, 'index.html', {
+        "accounts": accounts,
+        "counties": counties,
+        "countries": countries
+    })
+
 @login_required(login_url='/login/')
 def dashboards(request):
     profile = request.user.profile
