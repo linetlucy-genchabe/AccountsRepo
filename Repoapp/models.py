@@ -117,15 +117,24 @@ class Profile(models.Model):
             accessible_subcounties = accessible_subcounties | self.allowed_subcounties.all()
 
         return accessible_subcounties.distinct()
-
+    
     def get_accessible_accounts(self):
         accessible_subcounties = self.get_accessible_subcounties()
         accessible_counties = self.get_accessible_counties()
 
+    # Subcounty-only access → strict subcounty filter
+        if self.allowed_subcounties.exists() and not self.allowed_counties.exists() and not self.allowed_countries.exists():
+
+            return Accounts.objects.filter(
+            account_subcounty__in=accessible_subcounties
+            ).distinct()
+
+             # County or country access → filter by subcounties under allowed counties
         return Accounts.objects.filter(
             Q(account_subcounty__in=accessible_subcounties) |
             Q(account_county__in=accessible_counties)
         ).distinct()
+
 
     def save_profile(self):
         self.save()
