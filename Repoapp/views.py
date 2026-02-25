@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 import csv
 from django.http import JsonResponse
 import json
+from django.db.models import Q
 
 FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 
@@ -216,19 +217,27 @@ def update_lmsaccount(request,id):
     else:
         form6 = LmsaccountUpdateForm(instance=update)
     return render(request, 'edit_lmsaccount.html', {'form6': form6})
-
 @login_required(login_url='/login/')
 def search_accounts(request):
     if 'keyword' in request.GET and request.GET["keyword"]:
         search_term = request.GET.get("keyword")
-        searched_projects = Accounts.search_accounts(search_term)
-        message = f"{search_term}"
+        profile = request.user.profile
 
-        return render(request, 'search.html', {"message":message,"accounts": searched_projects})
+        if profile.role in FULL_ACCESS_ROLES:
+            base_queryset = Accounts.objects.all()
+        else:
+            base_queryset = profile.get_accessible_accounts()
+
+        searched_projects = base_queryset.filter(
+            Q(Username__icontains=search_term) |
+            Q(Name__icontains=search_term) |
+            Q(Community_Health_Unit__icontains=search_term)
+        )
+
+        return render(request, 'search.html', {"message": search_term, "accounts": searched_projects})
 
     else:
-        message = "You haven't searched for any term"
-        return render(request, 'search.html', {"message": message})
+        return render(request, 'search.html', {"message": "You haven't searched for any term"})
     
 @login_required(login_url='/login/')
 def search_lmsaccounts(request):
