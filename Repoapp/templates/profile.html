@@ -2,74 +2,84 @@
 {% load bootstrap5 %}
 
 {% block content %}
-<div class="container-fluid mb-4 pb-4" style="height: 100%;">
-  <div class="row">
-    <!-- Empty div -->
-    <div class="col-lg-2"></div>
 
-    <div class="col-lg-8 mt-4 pt-2 ">
-            <div class="pb-2">
-                {% if user.profile.photo %}
-            <img src="{{ user.profile.photo.url }}" alt="" class="d-flex justify-content-start rounded-circle mb-1 img-fluid mr-1" style="width: 200px;">
-            {% else %}
-            <img src="https://source.unsplash.com/1600x900/?user,profile" alt="" class="d-flex justify-content-start rounded-circle mb-1 img-fluid mr-1" style="width: 150px;">
-              {% endif %}
-                <h4> <span class="font-weight-bold"> Username:</span>  {{user.username}} </h4>
-        <p> <span class="font-weight-bold"> Email:</span>  {{user.email}} </p>
-        
-        
-        </div>
-        <hr>
-       
-        
-    </div>
-    <!-- empty div -->
-    <div class="col-lg-2"></div>
-
-  </div>
-
-  
-</div>
-
-<!-- Modal starts here -->
-<div class="modal fade" id="profile" tabindex="-1" role="dialog" aria-labelledby="exampleModal3Label" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModal3Label"></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        
-           <div>
-            <!-- profile update form  -->
-                  <!-- <h4 class="font-weight-bold">Update Your Profile</h4> -->
-                  <hr class="">
-                  <form  method="post" enctype="multipart/form-data">
-                  {% csrf_token %}
-                  {% bootstrap_form form%}
-
-                  <div class="form-group">
-                  <button type="submit" class="btn blue-gradient btn-lg mt-2 font-weight-bold btn-block"> Update </button>
-                  </div>
-
-                  <input type="hidden" name="next" value="{{next}}">
-
-              </form>
-          </div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-md" data-dismiss="modal">Close</button>
-        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-      </div>
-    </div>
+<div class="page-header">
+  <div class="container">
+    <h1>My Profile</h1>
+    <p>View your account details and access permissions</p>
   </div>
 </div>
 
+<div class="container py-4">
+  <div class="profile-card">
 
+    <!-- Avatar + basic info -->
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:28px; padding-bottom:24px; border-bottom:1px solid var(--gray-100);">
+      {% if user.profile.photo %}
+        <img src="{{ user.profile.photo.url }}" alt="Profile photo" class="profile-avatar">
+      {% else %}
+        <div style="
+          width:72px; height:72px; border-radius:50%;
+          background:var(--navy); color:var(--gold);
+          display:flex; align-items:center; justify-content:center;
+          font-family:'Fraunces',serif; font-size:28px; font-weight:700;
+          flex-shrink:0;
+        ">{{ user.username|first|upper }}</div>
+      {% endif %}
 
+      <div>
+        <div class="profile-username">{{ user.username }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+        {% if user.profile.role %}
+          <div class="profile-role-badge mt-1">{{ user.profile.role }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Details grid -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 32px; margin-bottom:28px;">
+      <div>
+        <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray-400); margin-bottom:4px;">Username</div>
+        <div style="font-size:15px; font-weight:500; color:var(--navy);">{{ user.username }}</div>
+      </div>
+      <div>
+        <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray-400); margin-bottom:4px;">Email</div>
+        <div style="font-size:15px; color:var(--navy);">{{ user.email|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray-400); margin-bottom:4px;">Role</div>
+        <div style="font-size:15px; color:var(--navy);">{{ user.profile.role|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray-400); margin-bottom:4px;">Bio</div>
+        <div style="font-size:14px; color:var(--gray-600);">{{ user.profile.bio|default:"No bio set" }}</div>
+      </div>
+    </div>
+
+    <!-- Access permissions summary -->
+    {% if user.profile.allowed_countries.all or user.profile.allowed_counties.all %}
+    <div style="background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--radius); padding:16px 20px;">
+      <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray-400); margin-bottom:12px;">Access Permissions</div>
+      {% if user.profile.allowed_countries.all %}
+      <div style="margin-bottom:8px;">
+        <span style="font-size:12px; font-weight:600; color:var(--navy);">Countries: </span>
+        {% for c in user.profile.allowed_countries.all %}
+          <span style="background:var(--navy);color:var(--gold);font-size:11px;padding:2px 9px;border-radius:10px;margin:2px;">{{ c.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if user.profile.allowed_counties.all %}
+      <div>
+        <span style="font-size:12px; font-weight:600; color:var(--navy);">Counties: </span>
+        {% for c in user.profile.allowed_counties.all %}
+          <span style="background:var(--gray-100);color:var(--navy);font-size:11px;padding:2px 9px;border-radius:10px;border:1px solid var(--gray-200);margin:2px;">{{ c.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
 
 {% endblock %}
