@@ -1,98 +1,95 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container-fluid px-4">
 
-<nav class="pl-5 pr-5 navbar navbar-expand-lg  bg-white shadow sticky-top" >
+    <!-- Brand -->
+    <a class="navbar-brand" href="{% url 'index' %}">
+      Accounts Repository
+    </a>
 
-    <!-- Navbar brand -->
-    <a class="navbar-brand font-weight-bold" href="{% url 'index' %}" style="color: black;">ACCOUNTS REPOSITORY</a>
-  
-    <!-- Collapse button -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
-      aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fas fa-bars"></i>
-      <!-- <span class="navbar-toggler-icon"></span> -->
+    <!-- Toggler -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+      aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars" style="color: var(--navy);"></i>
     </button>
-  
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="basicExampleNav">
-  
-      <!-- Links -->
-      <ul class="navbar-nav mr-auto">
-          <li class="text-black nav-item">
-            <!-- <a class="nav-link font-weight-bold" href="{% url 'index' %}" style="color: black;">Home</a> -->
-          </li>
-          
-        </li>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+
+      <!-- Left nav -->
+      <ul class="navbar-nav me-auto align-items-lg-center gap-1">
+
         {% if user.is_authenticated %}
-        <ul>
-          {% for category in category_results%}
-          <ul>
-            <li class="dropdown list-unstyled text-black">
-                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user"></i> CATEGORIES </a>
-              <ul class="dropdown-menu dropdown-default" role="menu">
-                <li>
-                    <a class="dropdown-item" href="#">Living Goods</a>
-                  </li>
-                
-              </ul>
+        <!-- Accounts dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
+            id="accountsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-database" style="font-size:12px; color:var(--gray-400);"></i> Accounts
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="accountsDropdown">
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'index' %}">
+                <i class="fas fa-heartbeat" style="font-size:12px; color:var(--gray-400);"></i> eCHIS
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'dashboards' %}">
+                <i class="fas fa-chart-bar" style="font-size:12px; color:var(--gray-400);"></i> Dashboards
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'lmsaccounts' %}">
+                <i class="fas fa-graduation-cap" style="font-size:12px; color:var(--gray-400);"></i> LMS
+              </a>
             </li>
           </ul>
-          {% endfor %}
-        </ul>
-        <li class="nav-item">
-          <a class="nav-link font-weight-bold" href="{%url 'index'%}" style="color: black;"> eCHIS </a>
-        </li> 
-        <li class="nav-item">
-          <a class="nav-link font-weight-bold" href="{%url 'dashboards'%}" style="color: black;"> DASHBOARDS </a>
-        </li> 
-        <li class="nav-item">
-          <a class="nav-link font-weight-bold" href="{%url 'lmsaccounts'%}" style="color: black;"> LMS  </a>
-        </li> 
-
+        </li>
         {% endif %}
-       
-        </ul>
-       
-      <!-- Links -->
-      
-      {% if user.is_authenticated %}
-          <form class="form-inline" action="{% url 'search_results' %}">
-            <div class="md-form my-1">
-              <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="keyword">
-            </div>
-            </form>
-          {% endif %}
-          <div class="col-sm-6 col-lg-6 d-flex justify-content-end">
-              {% if user.is_authenticated %}
-              
-              <ul>
-                <li class="dropdown list-unstyled text-black">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-user"></i> My Account </a>
-                  <ul class="dropdown-menu dropdown-default" role="menu">
-                    <li>
-                        <a class="dropdown-item" href="{%url 'profile'%}">Profile</a>
-                      </li>
-                    <!-- <li>
-                      <a class="dropdown-item" href="/accounts/password/change">Change Password</a>
-                    </li> -->
-                    <li>
-                      <a class="dropdown-item" href="/logout">Logout</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-              {% else %}
-              <li class="list-unstyled">
-                  <a class='btn  font-weight-bold' style="background-color:rgb(19, 5, 173);color: white; " href="/login">Login</a>
-                  <!-- <a class='btn  font-weight-bold' style="background-color:rgb(16, 65, 16);color: white; " href="/accounts/register">Register</a> -->
-              </li>
 
-              {% endif %}
+      </ul>
+
+      <!-- Right side -->
+      <div class="d-flex align-items-center gap-3">
+
+        {% if user.is_authenticated %}
+        <!-- Search -->
+        <form action="{% url 'search_results' %}" class="d-none d-lg-flex">
+          <input class="form-control" type="text" placeholder="Search accounts…" name="keyword" autocomplete="off">
+        </form>
+
+        <!-- User dropdown -->
+        <div class="dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
+            id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+            style="font-size:14px; font-weight:500; color:var(--navy);">
+            <span style="
+              width:32px; height:32px; border-radius:50%;
+              background:var(--navy); color:var(--gold);
+              display:inline-flex; align-items:center; justify-content:center;
+              font-size:13px; font-weight:700; font-family:'Fraunces',serif;
+            ">{{ user.username|first|upper }}</span>
+            {{ user.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'profile' %}">
+                <i class="fas fa-user" style="font-size:12px; color:var(--gray-400);"></i> Profile
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1" style="border-color:var(--gray-100);"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="/logout"
+                style="color:var(--danger);">
+                <i class="fas fa-sign-out-alt" style="font-size:12px;"></i> Logout
+              </a>
+            </li>
+          </ul>
         </div>
 
+        {% else %}
+        <a href="/login" class="btn-login nav-link">Sign In</a>
+        {% endif %}
+
+      </div>
     </div>
-    <!-- Collapsible content -->
-  </nav>
-  <!--/Navbar-->
+  </div>
+</nav>
