@@ -1,36 +1,41 @@
 {% extends 'base.html' %}
-{% load bootstrap5 %} 
+{% load bootstrap5 %}
 
-{% block content%}
+{% block content %}
 
-
-    <div class="jumbotron jumbotron-fluid bg-white pb-3 pt-4 shadow" style="margin-top: 1%;">
-            
-       <h1 class="display-5 text-center font-weight-bold" style="color: rgb(40, 15, 179);">Add a new Account </h1>
-    
-    </div>      
-<div class="container">
-  <div class="row">
-      <!-- Empty div -->
-      <div class="col-lg-3"></div>
-
-      <div class="col-lg-6 pt-2 shadow" style=" padding-bottom:1%;margin-top: 1%;margin-bottom: 1%;">
-            <form  action="{%url 'new-account'%}" method="post" style="padding-top: 3%;" enctype="multipart/form-data">
-              {%csrf_token%}
-
-              {% bootstrap_form form%}
-              
-              <input type="submit" class="btn btn-outline-info btn-lg font-weight-bold" value="SUBMIT">
-            </form>
-      </div>
-
-      <div class="col-lg-3"></div>
-    
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to Home
+    </a>
+    <h1>Add New Account</h1>
+    <p>Create a new eCHIS account record</p>
   </div>
-  <a href="{% url 'bulk_upload_accounts' %}" class="btn btn-outline-primary">Bulk Upload Accounts</a>
- 
-
-
-  
 </div>
+
+<div class="container py-4">
+  <div class="form-card">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--gray-100);">
+      <div>
+        <h2 style="font-size:18px; margin-bottom:3px;">Account Details</h2>
+        <p style="font-size:13px; color:var(--gray-600);">Fill in the fields below to register a new account</p>
+      </div>
+      <a href="{% url 'bulk_upload_accounts' %}" class="btn-outline-navy" style="font-size:13px; padding:7px 16px;">
+        <i class="fas fa-upload" style="font-size:11px;"></i> Bulk Upload
+      </a>
+    </div>
+
+    <form action="{% url 'new-account' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <div class="d-flex gap-3 mt-4">
+        <button type="submit" class="btn-navy">
+          <i class="fas fa-save" style="font-size:12px;"></i> Save Account
+        </button>
+        <a href="{% url 'index' %}" class="btn-outline-navy">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
