@@ -1,0 +1,33 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+<div class="page-header" style="background: linear-gradient(135deg, #0A2818 0%, #0D5C30 60%, #0D8A5E 100%);">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6);margin-bottom:12px;display:inline-flex;align-items:center;gap:6px;font-size:13px;text-decoration:none;">← Back to Home</a>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+      <span style="background:rgba(13,138,94,0.3);border:1px solid rgba(13,138,94,0.5);color:#6EE7B7;font-size:11px;font-weight:600;padding:3px 12px;border-radius:12px;letter-spacing:0.5px;">LMS</span>
+    </div>
+    <h1 style="margin-top:8px;">{{ county.name }}</h1>
+    <p>Select a subcounty to view LMS accounts</p>
+  </div>
+</div>
+
+<div class="container py-2">
+  {% if subcounties %}
+  <div class="section-label"><h2>Subcounties</h2><span class="count-badge">{{ subcounties|length }}</span></div>
+  <div class="location-grid">
+    {% for sub in subcounties %}
+    <a href="{% url 'lms_subcounty_detail' sub.id %}" class="location-card location-card--green">
+      <div class="location-card-icon">🏘</div>
+      <h3>{{ sub.name }}</h3>
+      <span>View LMS Accounts</span>
+      <div class="location-card-arrow">→</div>
+    </a>
+    {% empty %}
+    <div class="empty-state"><div class="empty-state-icon">📭</div><h3>No subcounties available</h3></div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-state-icon">📭</div><h3>No subcounties available</h3></div>
+  {% endif %}
+</div>
+{%endblock%}
