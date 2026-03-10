@@ -1,72 +1,71 @@
-{% extends 'base.html'%} 
-
+{% extends 'base.html'%}
 {% block content %}
-<div style="height: 100%;">
-  <div class="">
-    {% if accounts %}
-    <div class="jumbotron jumbotron-fluid bg-white shadow">
-        <div class="">
-          <h1 class="display-6 text-center font-weight-bold" style="color: rgb(11, 25, 179);">Found {{ accounts|length }} accounts for searched term {{message}}</h1>
-        </div>
-      </div>
-    {% else %}
-    <div class="jumbotron jumbotron-fluid bg-white shadow">
-        <div class="">
-          <h1 class="display-5 text-center font-weight-bold" style="color: rgb(43, 0, 128);">Found 0 accounts for the searched term {{message}}</h1>
-        </div>
-      </div>
-    {% endif %}
 
+<div class="page-header">
+  <div class="container">
+    <h1>Search Results</h1>
+    <p>Showing results for "<strong style="color:var(--gold-light);">{{ message }}</strong>"</p>
+  </div>
+</div>
+
+<div class="container py-2">
+
+  <!-- Result count banner -->
+  <div class="search-banner mb-4">
+    {% if accounts %}
+    <div class="search-count">{{ accounts|length }}</div>
+    <div>
+      <div class="search-label">accounts found for <span class="search-term">{{ message }}</span></div>
+    </div>
+    {% else %}
+    <div class="search-count" style="color:var(--gray-400);">0</div>
+    <div>
+      <div class="search-label">No accounts found for <span class="search-term">{{ message }}</span></div>
+      <div style="font-size:13px; color:var(--gray-400); margin-top:2px;">Try a different search term</div>
+    </div>
+    {% endif %}
   </div>
 
-  <div class="container-fluid">
-     
-      <div class="container">
-        <div class="row">
-         
-          <div class="col-md-1"></div>
-          <div class="col-md-10" style="float: left;display:flex;">
-            {% if accounts %}
-   <table class="table">
-    
-    <thead>
-      <tr>
-        <!-- <th scope="col">#</th> -->
-        
-        <th scope="col"><b>Subcounty</b></th>
-        <th scope="col">Name</th>
-        <th scope="col">Community_Health_Unit</th>
-        <th scope="col">Contact UUID</th>
-        <th scope="col">Username</th>
-        <th scope="col">Password</th>
-        
-      </tr>
-    </thead>
-    <tbody>
-        {% for account in accounts %}
-      <tr>
-        <!-- <th scope="row">1</th> -->
-        <td><b>{{account.account_subcounty}}</b></td>
-        <td><b>{{account.Name}}</b></td>
-        <td><b>{{account.Community_Health_Unit}}</b></td>
-        <td><b>{{account.Contact_UUID}}</b></td>
-        <td><b>{{account.Username}}</b></td>
-        <td><b>{{account.Password}}</b></td>
-        <td>
-            <a role="button" class="btn btn-sm btn-outline-info"  
-                href="{% url 'update-account' account.id%}">Edit</a>  
-       </td>
-        
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-          </div>
-        
-          
-        </div>
-      </div>
-      {% endif %}
+  {% if accounts %}
+  <div class="data-table-wrapper">
+    <div class="data-table-header">
+      <span class="data-table-title">Matched Accounts</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Subcounty</th>
+            <th>Name</th>
+            <th>Community Health Unit</th>
+            <th>Contact UUID</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in accounts %}
+          <tr>
+            <td>{{ account.account_subcounty }}</td>
+            <td><strong>{{ account.Name }}</strong></td>
+            <td>{{ account.Community_Health_Unit }}</td>
+            <td style="font-size:12px; color:var(--gray-600);">{{ account.Contact_UUID }}</td>
+            <td>{{ account.Username }}</td>
+            <td>{{ account.Password }}</td>
+            <td>
+              <a class="btn-edit" href="{% url 'update-account' account.id %}">
+                <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
+  {% endif %}
+
+</div>
+
 {% endblock %}
