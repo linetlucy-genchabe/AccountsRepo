@@ -1,11 +1,10 @@
-from django.shortcuts import get_object_or_404, render,redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.conf import settings
-from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.templatetags.static import static
-# from django.shortcuts import render, redirect, render_to_response, HttpResponseRedirect
-from django.http import HttpResponse, Http404, HttpResponseForbidden,HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseRedirect
 import datetime as dt
 from .models import *
 from .forms import *
@@ -22,7 +21,6 @@ FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 def index(request):
     profile = request.user.profile
 
-    # Full access roles bypass all restrictions
     if profile.role in FULL_ACCESS_ROLES:
         accounts = Accounts.objects.all()
         counties = County.objects.all()
@@ -37,6 +35,8 @@ def index(request):
         "counties": counties,
         "countries": countries
     })
+
+
 @login_required(login_url='/login/')
 def dashboards(request):
     profile = request.user.profile
@@ -64,20 +64,20 @@ def lmsaccounts(request):
 
 
 def user_login(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['password']  
-        
-        user = authenticate (request,username=username,password=password)
+        password = request.POST['password']
+
+        user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request,user)
-            messages.success(request,"Welcome , you are now logged in")
-            return redirect ("index")
+            login(request, user)
+            messages.success(request, "Welcome, you are now logged in")
+            return redirect("index")
         else:
-            messages.error(request,'Username or password not correct')
+            messages.error(request, 'Username or password not correct')
             return redirect('login')
-        
-    return render(request, 'login.html' )
+
+    return render(request, 'login.html')
 
 
 @login_required(login_url='/login/')
@@ -85,7 +85,6 @@ def new_account(request):
     current_user = request.user
     profile = request.user.profile
 
-   # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'UserManager', 'Superuser']:
         messages.error(request, "You do not have permission to add account.")
         return redirect('index')
@@ -96,10 +95,8 @@ def new_account(request):
             account = form.save(commit=False)
             account.Author = current_user
             account.author_profile = profile
-
             account.save()
         return redirect('index')
-
     else:
         form = NewAccountForm()
     return render(request, 'new_account.html', {"form": form})
@@ -110,7 +107,6 @@ def new_dashboard(request):
     current_user = request.user
     profile = request.user.profile
 
-   # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
         messages.error(request, "You do not have permission to add account.")
         return redirect('dashboards')
@@ -121,10 +117,8 @@ def new_dashboard(request):
             dashboardaccount = form.save(commit=False)
             dashboardaccount.Author = current_user
             dashboardaccount.author_profile = profile
-
             dashboardaccount.save()
         return redirect('dashboards')
-
     else:
         form4 = NewDashboardAccountForm()
     return render(request, 'new_dashboard.html', {"form4": form4})
@@ -134,8 +128,7 @@ def new_dashboard(request):
 def new_lmsaccount(request):
     current_user = request.user
     profile = request.user.profile
-   
-    # Check if user has permission to add accounts
+
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
         messages.error(request, "You do not have permission to add account.")
         return redirect('lmsaccounts')
@@ -146,28 +139,24 @@ def new_lmsaccount(request):
             lmsaccount = form.save(commit=False)
             lmsaccount.Author = current_user
             lmsaccount.author_profile = profile
-
             lmsaccount.save()
         return redirect('lmsaccounts')
-
     else:
         form5 = NewLmsaccountForm()
     return render(request, 'new_lmsaccount.html', {"form5": form5})
 
+
 @login_required(login_url='/login/')
-def update_account(request,id):
-    
+def update_account(request, id):
     profile = request.user.profile
 
-    # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
         messages.error(request, "You do not have permission to update account.")
         return redirect('index')
-    
+
     update = Accounts.objects.get(id=id)
     if request.method == 'POST':
-        form2= AccountUpdateForm(
-            request.POST, request.FILES, instance=update)
+        form2 = AccountUpdateForm(request.POST, request.FILES, instance=update)
         if form2.is_valid():
             form2.save()
             return redirect(index)
@@ -177,18 +166,16 @@ def update_account(request,id):
 
 
 @login_required(login_url='/login/')
-def update_dashboard(request,id):
+def update_dashboard(request, id):
     profile = request.user.profile
 
-    # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
         messages.error(request, "You do not have permission to update account.")
         return redirect('dashboards')
-    
+
     update = Dashboards.objects.get(id=id)
     if request.method == 'POST':
-        form3= DashboardUpdateForm(
-            request.POST, request.FILES, instance=update)
+        form3 = DashboardUpdateForm(request.POST, request.FILES, instance=update)
         if form3.is_valid():
             form3.save()
             return redirect(dashboards)
@@ -198,25 +185,24 @@ def update_dashboard(request,id):
 
 
 @login_required(login_url='/login/')
-def update_lmsaccount(request,id):
-    
+def update_lmsaccount(request, id):
     profile = request.user.profile
 
-    # Check if user has permission to add accounts
     if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
         messages.error(request, "You do not have permission to update account.")
         return redirect('lmsaccounts')
 
     update = Lmsaccounts.objects.get(id=id)
     if request.method == 'POST':
-        form6= LmsaccountUpdateForm(
-            request.POST, request.FILES, instance=update)
+        form6 = LmsaccountUpdateForm(request.POST, request.FILES, instance=update)
         if form6.is_valid():
             form6.save()
             return redirect(lmsaccounts)
     else:
         form6 = LmsaccountUpdateForm(instance=update)
     return render(request, 'edit_lmsaccount.html', {'form6': form6})
+
+
 @login_required(login_url='/login/')
 def search_accounts(request):
     if 'keyword' in request.GET and request.GET["keyword"]:
@@ -235,59 +221,54 @@ def search_accounts(request):
         )
 
         return render(request, 'search.html', {"message": search_term, "accounts": searched_projects})
-
     else:
         return render(request, 'search.html', {"message": "You haven't searched for any term"})
-    
+
+
 @login_required(login_url='/login/')
 def search_lmsaccounts(request):
     if 'keyword' in request.GET and request.GET["keyword"]:
         search_term = request.GET.get("keyword")
         searched_projects = Lmsaccounts.search_accounts(search_term)
         message = f"{search_term}"
-
-        return render(request, 'search.html', {"message":message,"lmsaccounts": searched_projects})
-
+        return render(request, 'search.html', {"message": message, "lmsaccounts": searched_projects})
     else:
         message = "You haven't searched for any term"
         return render(request, 'search.html', {"message": message})
 
+
 @login_required(login_url='/login/')
 def user_profiles(request):
     current_user = request.user
-    
     profile = Profile.objects.get(user=request.user)
-    # profile = request.user.profile
-    
+
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES,instance=profile)   
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            current_user=current_user
+            current_user = current_user
             profile = form.save(commit=False)
             profile.save()
             form.save()
             return redirect('profile')
-            
     else:
         form = ProfileUpdateForm()
 
+    return render(request, 'profile.html', {"form": form})
 
-    return render(request, 'profile.html', {"form":form})
 
 @login_required(login_url='/login/')
-
 def county(request):
-    counties=County.objects.all()
-    
+    counties = County.objects.all()
+    return render(request, 'index.html', {"counties": counties})
 
-    return render(request, 'index.html', {"counties":counties})
+
+# ─── eCHIS VIEWS ───────────────────────────────────────────────
 
 @login_required(login_url='/login/')
 def county_detail(request, county_id):
     county = get_object_or_404(County, id=county_id)
     profile = request.user.profile
 
-    # Full access roles and users with country-level access can see all counties
     if profile.role not in FULL_ACCESS_ROLES:
         accessible_counties = profile.get_accessible_counties()
         if not accessible_counties.filter(id=county_id).exists():
@@ -312,6 +293,7 @@ def subcounty_detail(request, subcounty_id):
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
     return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
 
+
 @login_required(login_url='/login/')
 def country_detail(request, country_id):
     country = get_object_or_404(Countries, id=country_id)
@@ -325,6 +307,106 @@ def country_detail(request, country_id):
     counties = country.counties.all()
     return render(request, 'countries.html', {'country': country, 'counties': counties})
 
+
+# ─── DASHBOARD VIEWS ───────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def dashboard_county_detail(request, county_id):
+    county = get_object_or_404(County, id=county_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_counties = profile.get_accessible_counties()
+        if not accessible_counties.filter(id=county_id).exists():
+            messages.error(request, "You do not have permission to view this county.")
+            return redirect('index')
+
+    subcounties = county.subcounty.all()
+    return render(request, 'dashboard_county.html', {'county': county, 'subcounties': subcounties})
+
+
+@login_required(login_url='/login/')
+def dashboard_subcounty_detail(request, subcounty_id):
+    subcounty = get_object_or_404(Subcounty, id=subcounty_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_subcounties = profile.get_accessible_subcounties()
+        if not accessible_subcounties.filter(id=subcounty_id).exists():
+            messages.error(request, "You do not have permission to view this subcounty.")
+            return redirect('index')
+
+    dashboard_accounts = Dashboards.objects.filter(account_subcounty=subcounty)
+    return render(request, 'dashboard_subcounty.html', {
+        'subcounty': subcounty,
+        'dashboard_accounts': dashboard_accounts
+    })
+
+
+@login_required(login_url='/login/')
+def dashboard_country_detail(request, country_id):
+    country = get_object_or_404(Countries, id=country_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        if not profile.allowed_countries.filter(id=country_id).exists():
+            messages.error(request, "You do not have permission to view this country.")
+            return redirect('index')
+
+    counties = country.counties.all()
+    return render(request, 'dashboard_country.html', {'country': country, 'counties': counties})
+
+
+# ─── LMS VIEWS ─────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def lms_county_detail(request, county_id):
+    county = get_object_or_404(County, id=county_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_counties = profile.get_accessible_counties()
+        if not accessible_counties.filter(id=county_id).exists():
+            messages.error(request, "You do not have permission to view this county.")
+            return redirect('index')
+
+    subcounties = county.subcounty.all()
+    return render(request, 'lms_county.html', {'county': county, 'subcounties': subcounties})
+
+
+@login_required(login_url='/login/')
+def lms_subcounty_detail(request, subcounty_id):
+    subcounty = get_object_or_404(Subcounty, id=subcounty_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        accessible_subcounties = profile.get_accessible_subcounties()
+        if not accessible_subcounties.filter(id=subcounty_id).exists():
+            messages.error(request, "You do not have permission to view this subcounty.")
+            return redirect('index')
+
+    lms_accounts = Lmsaccounts.objects.filter(account_subcounty=subcounty)
+    return render(request, 'lms_subcounty.html', {
+        'subcounty': subcounty,
+        'lms_accounts': lms_accounts
+    })
+
+
+@login_required(login_url='/login/')
+def lms_country_detail(request, country_id):
+    country = get_object_or_404(Countries, id=country_id)
+    profile = request.user.profile
+
+    if profile.role not in FULL_ACCESS_ROLES:
+        if not profile.allowed_countries.filter(id=country_id).exists():
+            messages.error(request, "You do not have permission to view this country.")
+            return redirect('index')
+
+    counties = country.counties.all()
+    return render(request, 'lms_country.html', {'country': country, 'counties': counties})
+
+
+# ─── EDIT LOCATION VIEWS ────────────────────────────────────────
 
 @login_required(login_url='/login/')
 def update_county(request, id):
@@ -352,23 +434,19 @@ def update_subcounty(request, id):
     return render(request, 'edit_subcounty.html', {'form': form})
 
 
+# ─── CSV EXPORTS ────────────────────────────────────────────────
+
 def export_accounts_csv(request):
-    # Get filter parameters
     county_id = request.GET.get('county')
     subcounty_id = request.GET.get('subcounty')
 
-    # Define response as a CSV file
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="accounts.csv"'
 
-    # Create a CSV writer
     writer = csv.writer(response)
-    
-    # Write the header row
     writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
-    # Fetch accounts based on filters
     accounts = Accounts.objects.all()
     if county_id:
         county = get_object_or_404(County, id=county_id)
@@ -377,18 +455,17 @@ def export_accounts_csv(request):
         subcounty = get_object_or_404(Subcounty, id=subcounty_id)
         accounts = accounts.filter(account_subcounty=subcounty)
 
-    # Write account data to CSV
     for account in accounts:
         writer.writerow([
-            account.Name, 
-            account.Contact_UUID, 
+            account.Name,
+            account.Contact_UUID,
             account.Area_UUID,
-            account.Community_Health_Unit, 
+            account.Community_Health_Unit,
             account.Username,
             account.Password,
-            account.account_category.name, 
-            account.account_subcounty.name, 
-            account.account_county.name, 
+            account.account_category.name,
+            account.account_subcounty.name,
+            account.account_county.name,
         ])
 
     return response
@@ -399,14 +476,14 @@ def bulk_upload_accounts(request):
         form = AccountUploadForm(request.POST, request.FILES)
         if form.is_valid():
             csv_file = request.FILES['file']
-            
+
             if not csv_file.name.endswith('.csv'):
                 messages.error(request, 'Invalid file format. Please upload a CSV file.')
                 return redirect('bulk_upload_accounts')
 
             decoded_file = csv_file.read().decode('utf-8').splitlines()
             reader = csv.reader(decoded_file)
-            next(reader)  # Skip header row
+            next(reader)
 
             success_count = 0
             error_count = 0
@@ -419,37 +496,32 @@ def bulk_upload_accounts(request):
                 try:
                     name, contact_uuid, area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
 
-                    # Check if county exists
                     try:
                         county = County.objects.get(name=county_name)
                     except County.DoesNotExist:
                         invalid_counties.add(county_name)
-                        continue  # Skip this row
+                        continue
 
-                    # Check if subcounty exists under the given county
                     try:
                         subcounty = Subcounty.objects.get(name=subcounty_name, subcounty_county=county)
                     except Subcounty.DoesNotExist:
                         invalid_subcounties.add(subcounty_name)
-                        continue  # Skip this row
+                        continue
 
-                    # Check for duplicate username or contact_uuid
                     if Accounts.objects.filter(Username=username).exists():
                         duplicate_usernames.add(username)
-                        continue  # Skip this row
+                        continue
 
                     if Accounts.objects.filter(Contact_UUID=contact_uuid).exists():
                         duplicate_uuids.add(contact_uuid)
-                        continue  # Skip this row
+                        continue
 
                     if Accounts.objects.filter(Area_UUID=area_uuid).exists():
                         duplicate_uuids.add(area_uuid)
-                        continue  # Skip this row
+                        continue
 
-                    # Get or create category
                     category, _ = Category.objects.get_or_create(name=category_name)
 
-                    # Create account
                     Accounts.objects.create(
                         Name=name,
                         Contact_UUID=contact_uuid,
@@ -467,67 +539,58 @@ def bulk_upload_accounts(request):
                     print(f"Error importing row: {row} - {str(e)}")
                     error_count += 1
 
-            # Display error messages for invalid entries
             if invalid_subcounties:
-                messages.error(request, f"Invalid subcounties: {', '.join(invalid_subcounties)}. Please correct them and try again.")
+                messages.error(request, f"Invalid subcounties: {', '.join(invalid_subcounties)}.")
             if invalid_counties:
-                messages.error(request, f"Invalid counties: {', '.join(invalid_counties)}. Please correct them and try again.")
+                messages.error(request, f"Invalid counties: {', '.join(invalid_counties)}.")
             if duplicate_usernames:
-                messages.warning(request, f"Skipped {len(duplicate_usernames)} duplicate usernames: {', '.join(duplicate_usernames)}.")
+                messages.warning(request, f"Skipped {len(duplicate_usernames)} duplicate usernames.")
             if duplicate_uuids:
-                messages.warning(request, f"Skipped {len(duplicate_uuids)} duplicate Contact UUIDs: {', '.join(duplicate_uuids)}.")
+                messages.warning(request, f"Skipped {len(duplicate_uuids)} duplicate UUIDs.")
 
-            # Show success message if any accounts were imported
             if success_count > 0:
                 messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
             else:
-                messages.error(request, "No valid accounts were imported. Please check errors and try again.")
+                messages.error(request, "No valid accounts were imported.")
 
             return redirect('bulk_upload_accounts')
-
     else:
         form = AccountUploadForm()
-    
+
     return render(request, 'bulk_upload.html', {'form': form})
 
-def export_subcounty_accounts_csv(request, subcounty_id):
-    print(f"Subcounty ID received: {subcounty_id}")  # Debugging step
 
+def export_subcounty_accounts_csv(request, subcounty_id):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="subcounty_{subcounty_id}_accounts.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Name', 'Contact UUID','Area UUID', 'Community Health Unit', 'Username', 'Password',
+    writer.writerow(['Name', 'Contact UUID', 'Area UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
     try:
         accounts = Accounts.objects.filter(account_subcounty_id=subcounty_id)
-        print(f"Accounts found: {accounts.count()}")  # Debugging step
     except Exception as e:
-        print(f"Error: {e}")  # Debugging step
         accounts = []
 
     for account in accounts:
         writer.writerow([
-            account.Name, 
-            account.Contact_UUID, 
+            account.Name,
+            account.Contact_UUID,
             account.Area_UUID,
-            account.Community_Health_Unit, 
+            account.Community_Health_Unit,
             account.Username,
             account.Password,
-            account.account_category.name, 
-            account.account_subcounty.name, 
+            account.account_category.name,
+            account.account_subcounty.name,
             account.account_county.name
         ])
 
     return response
- 
+
+
 @login_required(login_url='/login/')
 def export_dashboards_csv(request, county_id=None):
-    """
-    Exports dashboard data as a CSV file.
-    If a county_id is provided, only dashboards from that county are included.
-    """
     if county_id:
         try:
             county = County.objects.get(id=county_id)
@@ -547,14 +610,13 @@ def export_dashboards_csv(request, county_id=None):
 
     for dashboard in dashboards:
         writer.writerow([
-            dashboard.Name, 
+            dashboard.Name,
             dashboard.Role,
             dashboard.Community_Health_Unit,
             dashboard.Username,
             dashboard.Password,
             dashboard.account_subcounty.name,
             dashboard.account_county.name,
-            # dashboard.pub_date.strftime('%Y-%m-%d %H:%M')
         ])
 
     return response
@@ -562,10 +624,6 @@ def export_dashboards_csv(request, county_id=None):
 
 @login_required(login_url='/login/')
 def export_lmsaccounts_csv(request, county_id=None):
-    """
-    Exports lmsaccounts data as a CSV file.
-    If a county_id is provided, only lmsaccounts from that county are included.
-    """
     if county_id:
         try:
             county = County.objects.get(id=county_id)
@@ -585,13 +643,12 @@ def export_lmsaccounts_csv(request, county_id=None):
 
     for lmsaccount in lmsaccounts:
         writer.writerow([
-            lmsaccount.Name, 
+            lmsaccount.Name,
             lmsaccount.Community_Health_Unit,
             lmsaccount.Username,
             lmsaccount.Password,
             lmsaccount.account_subcounty.name,
             lmsaccount.account_county.name,
-            # dashboard.pub_date.strftime('%Y-%m-%d %H:%M')
         ])
 
     return response
@@ -599,6 +656,5 @@ def export_lmsaccounts_csv(request, county_id=None):
 
 def signout(request):
     logout(request)
-    messages.success(request,"You have logged out")
-           
+    messages.success(request, "You have logged out")
     return redirect("/")
