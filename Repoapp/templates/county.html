@@ -1,49 +1,43 @@
 {%extends 'base.html'%}{%load bootstrap5%}{% load static %}
 {%block content%}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>{{ county.name }} - Subcounties</title> -->
-</head>
-<body>
-    <div class="container ">
-        <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ county.name }} - Subcounties </h1>
-        <hr>
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'index' %}" class="back-link" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to Home
+    </a>
+    <h1>{{ county.name }}</h1>
+    <p>Select a subcounty to view its accounts</p>
+  </div>
+</div>
 
-    <!-- <h1>{{ county.name }} - Subcounties</h1> -->
-    <ul class="counties" style="align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    list-style-type: none;
-    padding-left: 0px;">
-        {% for subcounty in subcounty %}
-        <a href="{% url 'subcounty_detail' subcounty.id %}" style=" background-color: rgb(207, 246, 246);
-        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-        font-size: 35px;
-        margin: 35px;
-        padding: 20px;
-        text-align: center;text-decoration: none;">{{subcounty.name}} Credentials</a>
+<div class="container py-2">
 
-           <!-- <a><li>{{ subcounty.name }}</li></a>  -->
-        {% empty %}
-            <li>No subcounties available</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'county' %}"  style="margin-top: 3%;">Back to Counties</a>
+  {% if subcounty %}
+  <div class="section-label">
+    <h2>Subcounties</h2>
+    <span class="count-badge">{{ subcounty|length }}</span>
+  </div>
 
-<!-- <h1>List of Counties</h1>
-<ul>
-    {% for county in counties %}
-        <li><a href="{% url 'county_detail' county.id %}">{{ county.name }}</a></li>
+  <div class="location-grid">
+    {% for sub in subcounty %}
+    <a href="{% url 'subcounty_detail' sub.id %}" class="location-card">
+      <div class="location-card-icon">🏘</div>
+      <h3>{{ sub.name }}</h3>
+      <span><i class="fas fa-users" style="font-size:10px;"></i> View Accounts</span>
+      <div class="location-card-arrow">→</div>
+    </a>
     {% endfor %}
-</ul> -->
+  </div>
+
+  {% else %}
+  <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
+    <div style="font-size:48px; margin-bottom:16px;">📭</div>
+    <h3 style="font-size:18px; color:var(--gray-600);">No subcounties available</h3>
+    <p style="font-size:14px;">No subcounties have been added for {{ county.name }} yet.</p>
+  </div>
+  {% endif %}
 
 </div>
-</body>
-
 
 {%endblock%}

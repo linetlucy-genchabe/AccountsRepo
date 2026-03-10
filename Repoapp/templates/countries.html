@@ -1,38 +1,42 @@
 {%extends 'base.html'%}{%load bootstrap5%}{% load static %}
 {%block content%}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <div class="container">
-        <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ country.name }} - Counties</h1>
-        <hr>
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to Home
+    </a>
+    <h1>{{ country.name }}</h1>
+    <p>Select a county to view its subcounties and accounts</p>
+  </div>
+</div>
 
-    <ul class="counties" style="align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    list-style-type: none;
-    padding-left: 0px;">
-        {% for county in counties %}
-        <a href="{% url 'county_detail' county.id %}" style="background-color: rgb(207, 246, 246);
-        box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-        font-size: 35px;
-        margin: 35px;
-        padding: 20px;
-        text-align: center; text-decoration: none;">{{county.name}} Credentials</a>
+<div class="container py-2">
 
-        {% empty %}
-            <li>No counties available</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'index' %}" style="margin-top: 3%;">Back to Countries</a>
+  {% if counties %}
+  <div class="section-label">
+    <h2>Counties</h2>
+    <span class="count-badge">{{ counties|length }}</span>
+  </div>
+
+  <div class="location-grid">
+    {% for county in counties %}
+    <a href="{% url 'county_detail' county.id %}" class="location-card">
+      <div class="location-card-icon">📍</div>
+      <h3>{{ county.name }}</h3>
+      <span><i class="fas fa-sitemap" style="font-size:10px;"></i> View Subcounties</span>
+      <div class="location-card-arrow">→</div>
+    </a>
+    {% empty %}
+    <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
+      <div style="font-size:48px; margin-bottom:16px;">📭</div>
+      <h3 style="font-size:18px; color:var(--gray-600);">No counties available</h3>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% endif %}
 
 </div>
-</body>
 
 {%endblock%}

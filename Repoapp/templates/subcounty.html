@@ -3,76 +3,84 @@
 
 {% if user.is_authenticated %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-</head>
-<body>
-
-  <div class="container ">
-    <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">{{ subcounty.name }} - Accounts </h1>
-    <hr>
-
-    
-    <ul class="counties" style="align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    list-style-type: none;
-    padding-left: 0px;">
-        
-        
-
-        <div class="table-responsive" style="font-size: 0.85rem;">
-          <table class="table table-bordered table-striped align-middle">
-            <thead class="table-primary">
-              <tr>
-                <th scope="col">Subcounty</th>
-                <th scope="col">Name</th>
-                <th scope="col">Community Health Unit</th>
-                <th scope="col">Contact UUID</th>
-                <th scope="col">Area UUID</th>
-                <th scope="col">Username</th>
-                <th scope="col">Password</th>
-                
-              </tr>
-            </thead>
-            
-            <tbody>
-              {% for account in accounts %}
-              <tr>
-                <td><b>{{ account.account_subcounty }}</b></td>
-                <td><b>{{ account.Name }}</b></td>
-                <td><b>{{ account.Community_Health_Unit }}</b></td>
-                <td><b>{{ account.Contact_UUID }}</b></td>
-                <td><b>{{ account.Area_UUID }}</b></td>
-                <td><b>{{ account.Username }}</b></td>
-                <td><b>{{ account.Password }}</b></td>
-                <td>
-                  <a role="button" class="btn btn-sm btn-outline-info" href="{% url 'update-account' account.id %}">Edit</a>
-              </td>
-                
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        
-          
-        {% else %}
-            <li>No accounts available</li>
-            {% endif %}
-            
-        
-    </ul>
-    <a href="{% url 'county' %}">Back to Counties</a>
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to Home
+    </a>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1>{{ subcounty.name }}</h1>
+        <p>eCHIS accounts in this subcounty</p>
+      </div>
+      <div class="header-action">
+        <a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn-gold">
+          <i class="fas fa-download" style="font-size:12px;"></i> Export CSV
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
-</body>
 
+<div class="container py-2">
 
+  {% if accounts %}
+  <div class="data-table-wrapper">
+    <div class="data-table-header">
+      <span class="data-table-title">
+        Accounts
+        <span class="count-badge ms-2" style="background:var(--navy);color:white;font-size:11px;padding:2px 9px;border-radius:12px;">{{ accounts|length }}</span>
+      </span>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Subcounty</th>
+            <th>Name</th>
+            <th>Community Health Unit</th>
+            <th>Contact UUID</th>
+            <th>Area UUID</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in accounts %}
+          <tr>
+            <td>{{ account.account_subcounty }}</td>
+            <td><strong>{{ account.Name }}</strong></td>
+            <td>{{ account.Community_Health_Unit }}</td>
+            <td style="font-size:12px; color:var(--gray-600);">{{ account.Contact_UUID }}</td>
+            <td style="font-size:12px; color:var(--gray-600);">{{ account.Area_UUID }}</td>
+            <td>{{ account.Username }}</td>
+            <td>{{ account.Password }}</td>
+            <td>
+              <a class="btn-edit" href="{% url 'update-account' account.id %}">
+                <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  {% else %}
+  <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
+    <div style="font-size:48px; margin-bottom:16px;">📭</div>
+    <h3 style="font-size:18px; color:var(--gray-600);">No accounts in this subcounty</h3>
+    <p style="font-size:14px; margin-bottom:20px;">Add accounts to {{ subcounty.name }} to see them here.</p>
+    <a href="{% url 'new-account' %}" class="btn-navy">
+      <i class="fas fa-plus" style="font-size:12px;"></i> Add Account
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endif %}
 
 {%endblock%}
