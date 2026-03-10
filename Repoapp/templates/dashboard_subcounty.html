@@ -1,0 +1,76 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+<div class="page-header" style="background: linear-gradient(135deg, #0A1628 0%, #0D3B7A 60%, #0066CC 100%);">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6);margin-bottom:12px;display:inline-flex;align-items:center;gap:6px;font-size:13px;text-decoration:none;">← Back to Home</a>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+      <span style="background:rgba(0,102,204,0.3);border:1px solid rgba(0,102,204,0.5);color:#7EC8FF;font-size:11px;font-weight:600;padding:3px 12px;border-radius:12px;letter-spacing:0.5px;">DASHBOARDS</span>
+    </div>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="margin-top:8px;">
+      <div>
+        <h1>{{ subcounty.name }}</h1>
+        <p>Dashboard accounts in this subcounty</p>
+      </div>
+      <div class="header-action">
+        <a href="{% url 'new-dashboard' %}" class="btn-gold">
+          <i class="fas fa-plus" style="font-size:12px;"></i> New Dashboard Account
+        </a>
+        <a href="{% url 'export_dashboards_csv' %}" class="btn-gold" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
+          <i class="fas fa-download" style="font-size:12px;"></i> Export CSV
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-2">
+  {% if dashboard_accounts %}
+  <div class="data-table-wrapper">
+    <div class="data-table-header">
+      <span class="data-table-title">Dashboard Accounts
+        <span class="count-badge ms-2" style="background:var(--info);color:white;font-size:11px;padding:2px 9px;border-radius:12px;">{{ dashboard_accounts|length }}</span>
+      </span>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Community Health Unit</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dashboard in dashboard_accounts %}
+          <tr>
+            <td><strong>{{ dashboard.Name }}</strong></td>
+            <td>
+              <span style="background:var(--info-bg);color:var(--info);font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;">{{ dashboard.Role }}</span>
+            </td>
+            <td>{{ dashboard.Community_Health_Unit }}</td>
+            <td>{{ dashboard.Username }}</td>
+            <td>{{ dashboard.Password }}</td>
+            <td>
+              <a class="btn-edit" href="{% url 'update-dashboard' dashboard.id %}">
+                <i class="fas fa-pen" style="font-size:10px;"></i> Edit
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📊</div>
+    <h3>No dashboard accounts in this subcounty</h3>
+    <p style="margin-bottom:20px;">Add dashboard accounts to {{ subcounty.name }} to see them here.</p>
+    <a href="{% url 'new-dashboard' %}" class="btn-navy"><i class="fas fa-plus" style="font-size:12px;"></i> New Dashboard Account</a>
+  </div>
+  {% endif %}
+</div>
+{%endblock%}
