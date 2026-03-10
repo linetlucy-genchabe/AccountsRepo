@@ -5,9 +5,10 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    url(r'$', views.index, name='index'),
-    url(r'login/$', views.user_login, name='login'),
-    url(r'logout/$', views.signout),
+    path('', views.index, name='index'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.signout, name='signout'),
+
     url(r'^new/account$', views.new_account, name='new-account'),
     url(r'^new/dashboard$', views.new_dashboard, name='new-dashboard'),
     url(r'^new/lmsaccount$', views.new_lmsaccount, name='new-lmsaccount'),
@@ -44,7 +45,8 @@ urlpatterns = [
     path('update-subcounty/<int:id>/', views.update_subcounty, name='update-subcounty'),
 
     # ── Exports ──────────────────────────────────────────────────
-    url(r'export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
+    
+    url(r'^export-accounts/', views.export_accounts_csv, name='export_accounts_csv'),
     path('export-accounts/subcounty/<int:subcounty_id>/', views.export_subcounty_accounts_csv, name='export_subcounty_accounts_csv'),
     path('export_dashboards/', views.export_dashboards_csv, name='export_dashboards_csv'),
     path('export_lmsaccounts/', views.export_lmsaccounts_csv, name='export_lmsaccounts_csv'),
