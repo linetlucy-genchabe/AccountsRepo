@@ -1,42 +1,45 @@
 {% extends 'base.html' %}
-{% load bootstrap5 %} 
+{% load bootstrap5 %}
 
-{% block content%}
+{% block content %}
 
-
-    <div class="jumbotron jumbotron-fluid bg-white pb-3 pt-4 shadow" style="margin-top: 1%;">
-            
-       <h1 class="display-5 text-center font-weight-bold" style="color: rgb(40, 15, 179);">Edit Lms Account </h1>
-    
-    </div>      
-<div class="container">
-  <div class="row">
-      <!-- Empty div -->
-      <div class="col-lg-3"></div>
-
-      <div class="col-lg-6 pt-2 shadow" style=" padding-bottom:1%;margin-top: 1%;margin-bottom: 1%;">
-            <form  action="" method="post" style="padding-top: 3%;" enctype="multipart/form-data">
-              {%csrf_token%}
-
-              {% bootstrap_form form6%}
-              
-              <input type="submit" class="btn btn-info btn-lg font-weight-bold" value="UPDATE DETAILS">
-            </form>
-      </div>
-
-      <div class="col-lg-3"></div>
-      {% if messages %}
-                <div class="mt-3">
-                    {% for message in messages %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-           
-    
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'lmsaccounts' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to LMS Accounts
+    </a>
+    <h1>Edit LMS Account</h1>
+    <p>Update LMS user credentials</p>
   </div>
 </div>
+
+<div class="container py-4">
+  <div class="form-card">
+    <div style="margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--gray-100);">
+      <h2 style="font-size:18px; margin-bottom:3px;">LMS Account Details</h2>
+      <p style="font-size:13px; color:var(--gray-600);">Make changes and save to update this LMS account</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% bootstrap_form form6 %}
+      <div class="d-flex gap-3 mt-4">
+        <button type="submit" class="btn-gold">
+          <i class="fas fa-save" style="font-size:12px;"></i> Update Account
+        </button>
+        <a href="{% url 'lmsaccounts' %}" class="btn-outline-navy">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
