@@ -1,41 +1,76 @@
 {% extends 'base.html' %}{%load bootstrap5%}{% load static %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Bulk Upload Accounts</h2>
-    
 
+<div class="page-header">
+  <div class="container">
+    <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
+      ← Back to Home
+    </a>
+    <h1>Bulk Upload Accounts</h1>
+    <p>Upload a CSV file to add multiple accounts at once</p>
+  </div>
+</div>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="file" class="form-label">Upload CSV File</label>
-            <input type="file" class="form-control" name="file" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
+<div class="container py-4">
+  <div class="form-card" style="max-width:680px;">
 
-    <hr>
-
-    <h4>CSV Format:</h4>
-    <p><strong>Columns:</strong> Name, Contact UUID, Area UUID, Community Health Unit, Username, Password, Account Category, Subcounty, County</p>
-
-    {% if messages %}
-    <div id="popupMessage" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-        background-color: #f8d7da; color: #721c24; padding: 10px 20px; border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.2); display: block; z-index: 1000; margin-top: 6%;">
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
+    <div style="margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--gray-100);">
+      <h2 style="font-size:18px; margin-bottom:3px;">Upload CSV File</h2>
+      <p style="font-size:13px; color:var(--gray-600);">Accounts will be validated and imported in bulk</p>
     </div>
 
-    <script>
-        setTimeout(function () {
-            var popup = document.getElementById("popupMessage");
-            if (popup) {
-                popup.style.display = "none";
-            }
-        }, 8000);
-    </script>
-{% endif %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="upload-zone mb-4" onclick="document.getElementById('csvFile').click()">
+        <div class="upload-zone-icon">📄</div>
+        <h4>Click to select a CSV file</h4>
+        <p>or drag and drop your file here</p>
+        <input type="file" id="csvFile" name="file" accept=".csv" required
+          style="display:none;"
+          onchange="document.getElementById('fileName').textContent = this.files[0]?.name || ''">
+        <p id="fileName" style="margin-top:10px; font-size:13px; font-weight:600; color:var(--navy);"></p>
+      </div>
+
+      <button type="submit" class="btn-navy w-100">
+        <i class="fas fa-upload" style="font-size:12px;"></i> Upload & Import
+      </button>
+    </form>
+
+    <!-- CSV Format guide -->
+    <div class="csv-format-box mt-4">
+      <strong>Required CSV Column Order:</strong>
+      <div class="csv-columns">
+        <span class="csv-col-tag">Name</span>
+        <span class="csv-col-tag">Contact UUID</span>
+        <span class="csv-col-tag">Area UUID</span>
+        <span class="csv-col-tag">Community Health Unit</span>
+        <span class="csv-col-tag">Username</span>
+        <span class="csv-col-tag">Password</span>
+        <span class="csv-col-tag">Account Category</span>
+        <span class="csv-col-tag">Subcounty</span>
+        <span class="csv-col-tag">County</span>
+      </div>
+      <p style="margin-top:10px; font-size:12px; color:var(--gray-400);">
+        Duplicate usernames, UUIDs, or unrecognised counties/subcounties will be skipped with a warning.
+      </p>
+    </div>
+
+  </div>
 </div>
+
+{% if messages %}
+<div id="popupMessage">
+  {% for message in messages %}
+    <p style="margin:0 0 4px;">{{ message }}</p>
+  {% endfor %}
+</div>
+<script>
+  setTimeout(function () {
+    var popup = document.getElementById("popupMessage");
+    if (popup) popup.style.display = "none";
+  }, 8000);
+</script>
+{% endif %}
+
 {% endblock %}
