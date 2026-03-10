@@ -1,214 +1,213 @@
 {%extends 'base.html'%}{%load bootstrap5%}{% load static %}
 {%block content%}
 
-<!-- <div class="container">
-<img src="/static/images/Afya Nyumbani Magazine 1st Edition Cover.png" alt="mainpage" style="height: 550px;margin-top: 1%;">
-
-</div> -->
 {% if user.is_authenticated %}
-<div class="container_fluid">
+
+<div class="page-header">
   <div class="container">
-    <div class="container">
-      <div class="row">
-        
-                {% if countries %}
-<h1 style="color: rgb(16, 16, 155);">Countries</h1>
-<div class="row">
-  {% for country in countries %}
-  <div class="col-md-6">
-    <ul style="align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    list-style-type: none;
-    padding-left: 0px;">
-      <a href="{% url 'country_detail' country.id %}" style="background-color: rgb(207, 246, 246);
-      box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-      font-size: 35px;
-      margin: 35px;
-      padding: 20px;
-      text-align: center; text-decoration: none;">{{country.name}} Credentials</a>
-    </ul>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1>Welcome back, {{ user.username }}</h1>
+        <p>Select an account type and region to browse credentials</p>
+      </div>
+      <div class="header-action">
+        {% if user.profile.role in "Admin,RDHSO,UserManager,Superuser" %}
+        <a href="{% url 'new-account' %}" class="btn-gold">
+          <i class="fas fa-plus" style="font-size:12px;"></i> New Account
+        </a>
+        {% endif %}
+        <a href="{% url 'bulk_upload_accounts' %}" style="
+          background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.25);
+          padding:9px 20px; border-radius:var(--radius); font-size:14px; font-weight:500;
+          display:inline-flex; align-items:center; gap:7px; text-decoration:none;">
+          <i class="fas fa-upload" style="font-size:12px;"></i> Bulk Upload
+        </a>
+      </div>
+    </div>
   </div>
-  {% endfor %}
 </div>
-<hr>
-{% endif %} 
-      
-      
-          {% if counties %}
 
-          <h1 style="color: rgb(16, 16, 155);">Counties</h1>
+<div class="container py-3">
 
-          {% for county in counties %}
-          <div class="col-md-6">
-         
-          <ul class="counties" style="align-items: center;
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          list-style-type: none;
-          padding-left: 0px;">
-
-            <a href="{% url 'county_detail' county.id %}" style=" background-color: rgb(207, 246, 246);
-            box-shadow: 20px 20px 1px 2px rgb(7, 109, 242);
-            font-size: 35px;
-            margin: 35px;
-            padding: 20px;
-            text-align: center;text-decoration: none;">{{county.name}} Credentials</a>
-          </ul>
-        </div>
-          {% endfor %}
-          
-          {% endif %}
-          
-        </div>
-      
-  </div>
-    <div class="container ">
-      {% if messages %}
-  <div class="container mt-3">
+  {% if messages %}
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endfor %}
+  {% endif %}
+
+  <!-- Account type tabs -->
+  <div class="acct-tabs">
+    <button class="acct-tab active" onclick="switchTab(this, 'echis')">
+      <i class="fas fa-heartbeat"></i> eCHIS
+    </button>
+    <button class="acct-tab" onclick="switchTab(this, 'dashboards')">
+      <i class="fas fa-chart-bar"></i> Dashboards
+    </button>
+    <button class="acct-tab" onclick="switchTab(this, 'lms')">
+      <i class="fas fa-graduation-cap"></i> LMS
+    </button>
   </div>
-{% endif %}
-      <!-- <h1 style="color: rgb(15, 0, 128);margin-top: 2%;">All eCHIS Accounts </h1>
-      
-        <a class="nav-link font-weight-bold" href="{%url 'new-account'%}" style="color: rgb(7, 5, 132);"> ADD NEW ACCOUNT </a>
-      
-      <hr>
 
-      <div class="container-fluid">
-        
-        
-           
-            <div class="row">
-              <div class="col-md-"></div>
-          <div class="col-md-12" style="float: left;display:flex;">
-           {% if accounts %}
-           <div class="table-responsive" style="font-size: 0.75rem;">
-            <table class="table table-bordered table-striped">
-                <thead class="table-primary">
-                    <tr>
-                        <th scope="col">Subcounty</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Community_Health_Unit</th>
-                        <th scope="col">Contact UUID</th>
-                        <th scope="col">Area UUID</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Password</th>
-                        <th>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Download
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}">Download All Accounts</a></li>
-                                    {% for county in counties %}
-                                        <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?county={{ county.id }}">{{ county.name }} Accounts</a></li>
-                                    {% endfor %}
-                                    {% for subcounty in subcounties %}
-                                        <li><a class="dropdown-item" href="{% url 'export_accounts_csv' %}?subcounty={{ subcounty.id }}">{{ subcounty.name }} Accounts</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for account in accounts %}
-                        <tr>
-                            <td><b>{{ account.account_subcounty }}</b></td>
-                            <td><b>{{ account.Name }}</b></td>
-                            <td><b>{{ account.Community_Health_Unit }}</b></td>
-                            <td><b>{{ account.Contact_UUID }}</b></td>
-                            <td><b>{{ account.Area_UUID }}</b></td>
-                            <td><b>{{ account.Username }}</b></td>
-                            <td><b>{{ account.Password }}</b></td>
-                            <td>
-                                <a role="button" class="btn btn-sm btn-outline-info" href="{% url 'update-account' account.id %}">Edit</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-          </div>
-                
-   
-  
-          </div> -->
-             
-              {% endif %}
-            </div>
-          </div>
-                     
-                    </div>
-                  </div>
-
-
-
-     </div>
-     {% else %}
-
-     <div class="container d-flex justify-content-center align-items-center vh-100">
-      <div class="row shadow-lg rounded-4 bg-white p-4" style="max-width: 900px; width: 100%;">
-          <!-- Left Image Section -->
-          <div class="col-md-6 d-flex align-items-center justify-content-center">
-              <img src="{% static 'images/website-chronology-scaled.jpg' %}" 
-                   alt="Login Illustration" class="img-fluid rounded-3">
-          </div>
-  
-          <!-- Right Form Section -->
-          <div class="col-md-6">
-              <h2 class="text-center text-primary fw-bold">Sign In</h2>
-              <p class="text-muted text-center">Enter your credentials to access your account</p>
-  
-              <form action="{% url 'login' %}" method="POST">
-                  {% csrf_token %}
-                  <div class="mb-3">
-                      <label for="username" class="form-label fw-semibold">Username</label>
-                      <input type="text" class="form-control" id="username" name="username" required>
-                  </div>
-                  <div class="mb-3">
-                      <label for="password" class="form-label fw-semibold">Password</label>
-                      <input type="password" class="form-control" id="password" name="password" required>
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100 fw-bold">Login</button>
-              </form>
-  
-              <!-- Error Messages -->
-              {% if messages %}
-                  <div class="mt-3">
-                      {% for message in messages %}
-                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                              {{ message }}
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                          </div>
-                      {% endfor %}
-                  </div>
-              {% endif %}
-  
-              <!-- Register Link -->
-              <p class="text-center mt-3">
-
-                Welcome to LG Accounts repository!
-                  <!-- Don't have an account? <a href="/accounts/register" class="text-primary fw-semibold">Register here</a> -->
-              </p>
-          </div>
-      </div>
-  </div>
-     
-     {% endif %}
-
+  <!-- ── eCHIS ── -->
+  <div id="tab-echis" class="tab-content-panel active">
+    {% if countries %}
+    <div class="section-label mt-3"><h2>Countries</h2><span class="count-badge">{{ countries|length }}</span></div>
+    <div class="location-grid">
+      {% for country in countries %}
+      <a href="{% url 'country_detail' country.id %}" class="location-card">
+        <div class="location-card-icon">🌍</div>
+        <h3>{{ country.name }}</h3>
+        <span>View Counties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
     </div>
+    <div class="section-divider"></div>
+    {% endif %}
+    {% if counties %}
+    <div class="section-label"><h2>Counties</h2><span class="count-badge">{{ counties|length }}</span></div>
+    <div class="location-grid">
+      {% for county in counties %}
+      <a href="{% url 'county_detail' county.id %}" class="location-card">
+        <div class="location-card-icon">📍</div>
+        <h3>{{ county.name }}</h3>
+        <span>View Subcounties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if not countries and not counties %}
+    <div class="empty-state"><div class="empty-state-icon">📂</div><h3>No regions assigned</h3><p>Contact your administrator to get access.</p></div>
+    {% endif %}
+  </div>
 
+  <!-- ── Dashboards ── -->
+  <div id="tab-dashboards" class="tab-content-panel">
+    {% if countries %}
+    <div class="section-label mt-3"><h2>Countries</h2><span class="count-badge">{{ countries|length }}</span></div>
+    <div class="location-grid">
+      {% for country in countries %}
+      <a href="{% url 'dashboard_country_detail' country.id %}" class="location-card location-card--blue">
+        <div class="location-card-icon">🌍</div>
+        <h3>{{ country.name }}</h3>
+        <span>View Counties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="section-divider"></div>
+    {% endif %}
+    {% if counties %}
+    <div class="section-label"><h2>Counties</h2><span class="count-badge">{{ counties|length }}</span></div>
+    <div class="location-grid">
+      {% for county in counties %}
+      <a href="{% url 'dashboard_county_detail' county.id %}" class="location-card location-card--blue">
+        <div class="location-card-icon">📍</div>
+        <h3>{{ county.name }}</h3>
+        <span>View Subcounties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if not countries and not counties %}
+    <div class="empty-state"><div class="empty-state-icon">📊</div><h3>No regions assigned</h3><p>Contact your administrator to get access.</p></div>
+    {% endif %}
+  </div>
 
+  <!-- ── LMS ── -->
+  <div id="tab-lms" class="tab-content-panel">
+    {% if countries %}
+    <div class="section-label mt-3"><h2>Countries</h2><span class="count-badge">{{ countries|length }}</span></div>
+    <div class="location-grid">
+      {% for country in countries %}
+      <a href="{% url 'lms_country_detail' country.id %}" class="location-card location-card--green">
+        <div class="location-card-icon">🌍</div>
+        <h3>{{ country.name }}</h3>
+        <span>View Counties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="section-divider"></div>
+    {% endif %}
+    {% if counties %}
+    <div class="section-label"><h2>Counties</h2><span class="count-badge">{{ counties|length }}</span></div>
+    <div class="location-grid">
+      {% for county in counties %}
+      <a href="{% url 'lms_county_detail' county.id %}" class="location-card location-card--green">
+        <div class="location-card-icon">📍</div>
+        <h3>{{ county.name }}</h3>
+        <span>View Subcounties</span>
+        <div class="location-card-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if not countries and not counties %}
+    <div class="empty-state"><div class="empty-state-icon">🎓</div><h3>No regions assigned</h3><p>Contact your administrator to get access.</p></div>
+    {% endif %}
+  </div>
 
+</div>
+
+<script>
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.acct-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+</script>
+
+{% else %}
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-left">
+      <div class="login-left-logo">
+        <span style="width:36px;height:36px;background:rgba(240,165,0,0.2);border:1px solid rgba(240,165,0,0.4);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;">⚕</span>
+        Accounts <span>Repository</span>
+      </div>
+      <h2>Manage health system credentials with confidence</h2>
+      <p>A secure, role-based platform for eCHIS, Dashboard and LMS account management across counties and subcounties.</p>
+      <div class="login-left-features">
+        <div class="login-left-feature">Role-based access control</div>
+        <div class="login-left-feature">Country → County → Subcounty hierarchy</div>
+        <div class="login-left-feature">CSV export &amp; bulk upload</div>
+        <div class="login-left-feature">eCHIS, Dashboard &amp; LMS accounts</div>
+      </div>
+    </div>
+    <div class="login-right">
+      <h3>Sign In</h3>
+      <p class="login-sub">Enter your credentials to access the repository</p>
+      <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required autofocus>
+        </div>
+        <div class="mb-4">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn-login-submit">Sign In →</button>
+      </form>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      <p style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:24px;">LG Accounts Repository · Restricted Access</p>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 {%endblock%}
-
-
