@@ -18,12 +18,6 @@ from django.db.models import Q
 FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 
 
-from django.core.management import call_command
-from django.http import HttpResponse
-
-def run_migrations(request):
-    call_command('migrate')
-    return HttpResponse("Migrations complete")
 
 @login_required(login_url='/login/')
 def index(request):
