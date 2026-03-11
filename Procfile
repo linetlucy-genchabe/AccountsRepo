@@ -1,2 +1,1 @@
-
-web: gunicorn accounts.wsgi
+web: gunicorn accounts.wsgi 

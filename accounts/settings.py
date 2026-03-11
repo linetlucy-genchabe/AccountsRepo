@@ -28,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!ubog3tqms99&o8sat+)ye_#a=0&luuxps#o3bn#9vc-n$r%z1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'accountsrepo.up.railway.app']  
+ALLOWED_HOSTS = ['*', 'accountsrepo.up.railway.app']  # remove https://
 
 
 # Application definition
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'accounts.wsgi.application'
 DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@monorail.proxy.rlwy.net:13964/railway'
 DATABASES = {
     'default': 
-    dj_database_url.parse(DATABASE_URL, conn_max_age=0, conn_health_checks=True,),
+    dj_database_url.parse(DATABASE_URL,conn_max_age=600),
 }
 
 

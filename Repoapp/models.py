@@ -10,8 +10,10 @@ from django.db.models import Q
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     
+    
     def __str__(self):
         return self.name
+
 
     def save_category(self):
         self.save()
@@ -19,7 +21,7 @@ class Category(models.Model):
 
 class Countries(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    code = models.CharField(max_length=10, unique=True, blank=True, null=True)  # e.g. KE, UG, TZ
 
     def __str__(self):
         return self.name
@@ -46,6 +48,7 @@ class County(models.Model):
     def __str__(self):
         return self.name
 
+
     def save_county(self):
         self.save()
 
@@ -56,10 +59,11 @@ class County(models.Model):
 
 class Subcounty(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    subcounty_county = models.ForeignKey(County, on_delete=models.CASCADE, related_name="subcounty")
+    subcounty_county=models.ForeignKey(County,on_delete=models.CASCADE,related_name="subcounty")
     
     def __str__(self):
         return self.name
+
 
     def save_subcounty(self):
         self.save()
@@ -118,18 +122,23 @@ class Profile(models.Model):
         accessible_subcounties = self.get_accessible_subcounties()
         accessible_counties = self.get_accessible_counties()
 
+    # Subcounty-only access → strict subcounty filter
         if self.allowed_subcounties.exists() and not self.allowed_counties.exists() and not self.allowed_countries.exists():
+
             return Accounts.objects.filter(
-                account_subcounty__in=accessible_subcounties
+            account_subcounty__in=accessible_subcounties
             ).distinct()
 
+             # County or country access → filter by subcounties under allowed counties
         return Accounts.objects.filter(
             Q(account_subcounty__in=accessible_subcounties) |
             Q(account_county__in=accessible_counties)
         ).distinct()
 
+
     def save_profile(self):
         self.save()
+
 
     def delete_profile(self):
         self.delete()
@@ -143,19 +152,19 @@ class Profile(models.Model):
         
 class Accounts(models.Model):
     Name = models.CharField(max_length=255)
-    # ↓ Both UUIDs are now optional — add them later via bulk update
-    Contact_UUID = models.CharField(max_length=1000, blank=True, null=True)
-    Area_UUID = models.CharField(max_length=1000, null=True, blank=True)
+    Contact_UUID = models.CharField(max_length=1000)
+    Area_UUID = models.CharField(max_length=1000, null=True ,blank=True)
     Community_Health_Unit = models.CharField(max_length=255)
     Username = models.CharField(max_length=255)
     Password = models.CharField(max_length=255)
     account_category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE, related_name="accountnames")
+    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE,related_name="accountnames")
     account_county = models.ForeignKey(County, on_delete=models.CASCADE)
     account_country = models.CharField(max_length=255, default='Kenya')
     pub_date = models.DateTimeField(auto_now_add=True)
     Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    admin_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, default='1')
+    admin_profile = models.ForeignKey(Profile,on_delete=models.CASCADE, blank=True, default='1')
+    
     
     def save_accounts(self):
         self.save()
@@ -165,30 +174,43 @@ class Accounts(models.Model):
         
     @classmethod
     def get_allaccounts(cls):
-        return cls.objects.all()
+        accounts = cls.objects.all()
+        return accounts
     
     @classmethod
     def search_accounts(cls, search_term):
-        return cls.objects.filter(Username__icontains=search_term) | cls.objects.filter(Name__icontains=search_term)
+        accounts = cls.objects.filter(Username__icontains=search_term)| cls.objects.filter(Name__icontains=search_term)
+
+        
+        return accounts
     
     @classmethod
     def get_by_Category(cls, categories):
-        return cls.objects.filter(category__name__icontains=categories)
+        accounts = cls.objects.filter(category__name__icontains=categories)
+        return accounts
     
     @classmethod
     def get_by_County(cls, counties):
-        return cls.objects.filter(category__name__icontains=counties)
-
+        accounts = cls.objects.filter(category__name__icontains=counties)
+        return accounts
     @classmethod
     def get_by_Subcounty(cls, subcounty):
         return cls.objects.filter(account_subcounty=subcounty)
+
+    # @classmethod
+    # def get_by_Subcounty(cls, subcounties):
+    #     accounts = cls.objects.filter(category__name__icontains=subcounties)
+    #     return accounts
     
     @classmethod
     def get_accounts(request, id):
         try:
-            return Accounts.objects.get(pk=id)
+            account = Accounts.objects.get(pk = id)
+            
         except ObjectDoesNotExist:
             raise Http404()
+        
+        return account
     
     def update_accounts(self):
         self.update_accounts()
@@ -207,11 +229,13 @@ class Dashboards(models.Model):
     Community_Health_Unit = models.CharField(max_length=255)
     Username = models.CharField(max_length=255)
     Password = models.CharField(max_length=255)
-    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE, related_name="dashboardnames")
+    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE,related_name="dashboardnames")
     account_county = models.ForeignKey(County, on_delete=models.CASCADE)
     account_country = models.CharField(max_length=255, default='Kenya')
     pub_date = models.DateTimeField(auto_now_add=True)
-    admin_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, default='1')
+    # Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    admin_profile = models.ForeignKey(Profile,on_delete=models.CASCADE, blank=True, default='1')
+    
     
     def save_dashboards(self):
         self.save()
@@ -221,18 +245,40 @@ class Dashboards(models.Model):
         
     @classmethod
     def get_alldashboards(cls):
-        return cls.objects.all()
+        dashboards = cls.objects.all()
+        return dashboards
     
     @classmethod
     def search_dashboards(cls, search_term):
-        return cls.objects.filter(Username__icontains=search_term) | cls.objects.filter(Name__icontains=search_term)
+        dashboards = cls.objects.filter(Username__icontains=search_term)| cls.objects.filter(Name__icontains=search_term)
+
+        
+        return dashboards
+    
+    @classmethod
+    def get_by_Category(cls, categories):
+        dashboards = cls.objects.filter(category__name__icontains=categories)
+        return dashboards
+    
+    @classmethod
+    def get_by_County(cls, counties):
+        dashboards = cls.objects.filter(category__name__icontains=counties)
+        return dashboards
+    
+    @classmethod
+    def get_by_Subcounty(cls, subcounties):
+        dashboards = cls.objects.filter(category__name__icontains=subcounties)
+        return dashboards
     
     @classmethod
     def get_dashboards(request, id):
         try:
-            return Dashboards.objects.get(pk=id)
+            dashboard = Dashboards.objects.get(pk = id)
+            
         except ObjectDoesNotExist:
             raise Http404()
+        
+        return dashboard
     
     def update_dashboards(self):
         self.update_dashboards()
@@ -252,12 +298,13 @@ class Lmsaccounts(models.Model):
     Username = models.CharField(max_length=255)
     Password = models.CharField(max_length=255)
     account_category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE, related_name="lmsaccountnames")
+    account_subcounty = models.ForeignKey(Subcounty, on_delete=models.CASCADE,related_name="lmsaccountnames")
     account_county = models.ForeignKey(County, on_delete=models.CASCADE)
     account_country = models.CharField(max_length=255, default='Kenya')
     pub_date = models.DateTimeField(auto_now_add=True)
     Admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    admin_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, default='1')
+    admin_profile = models.ForeignKey(Profile,on_delete=models.CASCADE, blank=True, default='1')
+    
     
     def save_lmsaccounts(self):
         self.save()
@@ -267,22 +314,43 @@ class Lmsaccounts(models.Model):
         
     @classmethod
     def get_alllmsaccounts(cls):
-        return cls.objects.all()
+        lms = cls.objects.all()
+        return lms
     
     @classmethod
     def search_lmsaccounts(cls, search_term):
-        return cls.objects.filter(Username__icontains=search_term) | cls.objects.filter(Name__icontains=search_term)
+        lmsaccounts = cls.objects.filter(Username__icontains=search_term)| cls.objects.filter(Name__icontains=search_term)
 
+        
+        return lmsaccounts
+    
+    @classmethod
+    def get_by_Category(cls, categories):
+        lmsaccounts = cls.objects.filter(category__name__icontains=categories)
+        return lmsaccounts
+    
+    @classmethod
+    def get_by_County(cls, counties):
+        lmsaccounts = cls.objects.filter(category__name__icontains=counties)
+        return lmsaccounts
     @classmethod
     def get_by_Subcounty(cls, subcounty):
         return cls.objects.filter(account_subcounty=subcounty)
+
+    # @classmethod
+    # def get_by_Subcounty(cls, subcounties):
+    #     accounts = cls.objects.filter(category__name__icontains=subcounties)
+    #     return accounts
     
     @classmethod
     def get_accounts(request, id):
         try:
-            return Lmsaccounts.objects.get(pk=id)
+            lmsaccount = Lmsaccounts.objects.get(pk = id)
+            
         except ObjectDoesNotExist:
             raise Http404()
+        
+        return lmsaccount
     
     def update_lmsaccounts(self):
         self.update_lmsaccounts()
@@ -294,3 +362,4 @@ class Lmsaccounts(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'My lmsaccounts'
         verbose_name_plural = 'lmsaccounts'
+

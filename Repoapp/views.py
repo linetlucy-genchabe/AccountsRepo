@@ -17,8 +17,6 @@ from django.db.models import Q
 
 FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 
-
-
 @login_required(login_url='/login/')
 def index(request):
     profile = request.user.profile
