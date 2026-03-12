@@ -147,7 +147,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CSRF_TRUSTED_ORIGINS = ['https://accountsrepo.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://accountsrepo.up.railway.app', 'https://accountsapp.up.railway.app']
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 LOGIN_REDIRECT_URL ='/accounts/profile/'
