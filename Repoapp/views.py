@@ -512,11 +512,11 @@ def bulk_upload_accounts(request):
                         duplicate_usernames.add(username)
                         continue
 
-                    if Accounts.objects.filter(Contact_UUID=contact_uuid).exists():
+                    if contact_uuid and Accounts.objects.filter(Contact_UUID=contact_uuid).exists():
                         duplicate_uuids.add(contact_uuid)
                         continue
 
-                    if Accounts.objects.filter(Area_UUID=area_uuid).exists():
+                    if area_uuid and Accounts.objects.filter(Area_UUID=area_uuid).exists():
                         duplicate_uuids.add(area_uuid)
                         continue
 
@@ -524,8 +524,8 @@ def bulk_upload_accounts(request):
 
                     Accounts.objects.create(
                         Name=name,
-                        Contact_UUID=contact_uuid,
-                        Area_UUID=area_uuid,
+                        Contact_UUID=contact_uuid if contact_uuid else None,
+                        Area_UUID=area_uuid if area_uuid else None,
                         Community_Health_Unit=community_health_unit,
                         Username=username,
                         Password=password,
