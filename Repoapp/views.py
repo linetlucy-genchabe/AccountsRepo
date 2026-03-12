@@ -444,7 +444,7 @@ def export_accounts_csv(request):
     response['Content-Disposition'] = 'attachment; filename="accounts.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Name', 'Contact UUID', 'Community Health Unit', 'Username', 'Password',
+    writer.writerow(['Name', 'Contact UUID', 'Area UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
     accounts = Accounts.objects.all()
@@ -483,7 +483,7 @@ def bulk_upload_accounts(request):
 
             decoded_file = csv_file.read().decode('utf-8').splitlines()
             reader = csv.reader(decoded_file)
-            next(reader)
+            next(reader)  # skip header row
 
             success_count = 0
             error_count = 0
@@ -491,27 +491,47 @@ def bulk_upload_accounts(request):
             duplicate_uuids = set()
             invalid_subcounties = set()
             invalid_counties = set()
+            error_rows = []
 
-            for row in reader:
+            for i, row in enumerate(reader, start=2):  # start=2 since row 1 is header
                 try:
-                    name, contact_uuid, area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = row
+                    # Skip completely empty rows
+                    if not any(col.strip() for col in row):
+                        continue
 
+                    # Must have at least 9 columns
+                    if len(row) < 9:
+                        error_rows.append(f"Row {i}: only {len(row)} columns (expected 9)")
+                        error_count += 1
+                        continue
+
+                    # Strip whitespace from all fields
+                    name, contact_uuid, area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = [col.strip() for col in row[:9]]
+
+                    # Normalize empty UUIDs to None
+                    contact_uuid = contact_uuid or None
+                    area_uuid = area_uuid or None
+
+                    # Validate county (case-insensitive)
                     try:
-                        county = County.objects.get(name=county_name)
+                        county = County.objects.get(name__iexact=county_name)
                     except County.DoesNotExist:
                         invalid_counties.add(county_name)
                         continue
 
+                    # Validate subcounty (case-insensitive)
                     try:
-                        subcounty = Subcounty.objects.get(name=subcounty_name, subcounty_county=county)
+                        subcounty = Subcounty.objects.get(name__iexact=subcounty_name, subcounty_county=county)
                     except Subcounty.DoesNotExist:
                         invalid_subcounties.add(subcounty_name)
                         continue
 
+                    # Check duplicate username
                     if Accounts.objects.filter(Username=username).exists():
                         duplicate_usernames.add(username)
                         continue
 
+                    # Check duplicate UUID only if non-blank
                     if contact_uuid and Accounts.objects.filter(Contact_UUID=contact_uuid).exists():
                         duplicate_uuids.add(contact_uuid)
                         continue
@@ -520,12 +540,14 @@ def bulk_upload_accounts(request):
                         duplicate_uuids.add(area_uuid)
                         continue
 
+                    # Get or create category
                     category, _ = Category.objects.get_or_create(name=category_name)
 
+                    # Create account
                     Accounts.objects.create(
                         Name=name,
-                        Contact_UUID=contact_uuid if contact_uuid else None,
-                        Area_UUID=area_uuid if area_uuid else None,
+                        Contact_UUID=contact_uuid,
+                        Area_UUID=area_uuid,
                         Community_Health_Unit=community_health_unit,
                         Username=username,
                         Password=password,
@@ -535,21 +557,24 @@ def bulk_upload_accounts(request):
                         Admin=request.user
                     )
                     success_count += 1
+
                 except Exception as e:
-                    print(f"Error importing row: {row} - {str(e)}")
+                    error_rows.append(f"Row {i}: {str(e)}")
                     error_count += 1
 
+            # Report results
             if invalid_subcounties:
-                messages.error(request, f"Invalid subcounties: {', '.join(invalid_subcounties)}.")
+                messages.error(request, f"Unrecognised subcounties (check spelling): {', '.join(sorted(invalid_subcounties))}")
             if invalid_counties:
-                messages.error(request, f"Invalid counties: {', '.join(invalid_counties)}.")
+                messages.error(request, f"Unrecognised counties (check spelling): {', '.join(sorted(invalid_counties))}")
             if duplicate_usernames:
-                messages.warning(request, f"Skipped {len(duplicate_usernames)} duplicate usernames.")
+                messages.warning(request, f"Skipped {len(duplicate_usernames)} duplicate username(s).")
             if duplicate_uuids:
-                messages.warning(request, f"Skipped {len(duplicate_uuids)} duplicate UUIDs.")
-
+                messages.warning(request, f"Skipped {len(duplicate_uuids)} duplicate UUID(s).")
+            if error_rows:
+                messages.warning(request, f"Errors on {len(error_rows)} row(s): {' | '.join(error_rows[:5])}")
             if success_count > 0:
-                messages.success(request, f'Successfully imported {success_count} accounts. Errors: {error_count}.')
+                messages.success(request, f'Successfully imported {success_count} accounts. Skipped: {error_count}.')
             else:
                 messages.error(request, "No valid accounts were imported.")
 
