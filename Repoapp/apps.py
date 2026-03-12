@@ -1,6 +1,8 @@
 from django.apps import AppConfig
 
-
 class RepoappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'Repoapp'
+
+    def ready(self):
+        import Repoapp.signals
