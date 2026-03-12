@@ -152,7 +152,7 @@ class Profile(models.Model):
         
 class Accounts(models.Model):
     Name = models.CharField(max_length=255)
-    Contact_UUID = models.CharField(max_length=1000)
+    Contact_UUID = models.CharField(max_length=1000,null=True ,blank=True)
     Area_UUID = models.CharField(max_length=1000, null=True ,blank=True)
     Community_Health_Unit = models.CharField(max_length=255)
     Username = models.CharField(max_length=255)
