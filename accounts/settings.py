@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'accounts.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 
-DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@postgres.railway.internal:5432/railway'
+DATABASE_URL= os.environ.get('DATABASE_URL', '')
 DATABASES = {
     'default': 
     dj_database_url.parse(DATABASE_URL, conn_max_age=0, conn_health_checks=True),
@@ -152,4 +152,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 LOGIN_REDIRECT_URL ='/accounts/profile/'
 
-# DATABASE_URL= 'postgresql://postgres:srXrmMJMCEytsZmoHYoFrmHMgmDtKFpe@postgres.railway.internal:5432/railway'
+# DATABASE_URL= os.environ.get('DATABASE_URL', '')
