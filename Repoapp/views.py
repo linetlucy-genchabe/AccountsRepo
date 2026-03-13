@@ -27,7 +27,7 @@ def index(request):
     if profile.role in ['CHA', 'CHEW']:
         subcounties = profile.allowed_subcounties.all()
         if subcounties.exists():
-            return redirect('subcounty-detail', subcounty_id=subcounties.first().id)
+            return redirect('subcounty_detail', subcounty_id=subcounties.first().id)
         else:
             messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
 
