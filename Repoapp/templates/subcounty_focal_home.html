@@ -9,7 +9,7 @@
         <h1>{{ greeting }}, {{ user.first_name|default:user.username }} 👋</h1>
         <p style="opacity:0.85;">
           Subcounty Focal &nbsp;·&nbsp; {{ subcounty.name }} Subcounty
-          &nbsp;·&nbsp; {{ total_accounts }} account{{ total_accounts|pluralize }} across {{ chus|length }} CHU{{ chus|length|pluralize }}
+        
         </p>
       </div>
       <div class="header-action">
@@ -58,13 +58,20 @@
     </div>
   </div>
 
+  <!-- CHU search filter -->
+  <div class="form-card mb-3" style="padding:14px 20px;">
+    <input type="text" id="chuSearch" placeholder="Search Community Health Units..."
+      class="form-control form-control-sm" style="font-size:13px; max-width:400px;"
+      oninput="filterCHUs(this.value)">
+  </div>
+
   <!-- CHU Cards -->
   <div class="section-label mb-3">
     <h2>Community Health Units</h2>
-    <span class="count-badge">{{ chus|length }}</span>
+    <span class="count-badge" id="chuCount">{{ chus|length }}</span>
   </div>
 
-  <div class="location-grid">
+  <div class="location-grid" id="chuGrid">
     {% for chu in chus %}
     <a href="{% url 'subcounty_detail' subcounty.id %}?chu={{ chu.name|urlencode }}" class="location-card" style="text-decoration:none;">
       <div class="location-card-icon">🏥</div>
@@ -78,6 +85,13 @@
       <div class="location-card-arrow">→</div>
     </a>
     {% endfor %}
+  </div>
+
+  <!-- No results message -->
+  <div id="noResults" style="display:none; text-align:center; padding:40px 20px; color:var(--gray-400);">
+    <div style="font-size:36px; margin-bottom:12px;">🔍</div>
+    <h3 style="font-size:16px; color:var(--gray-600);">No CHUs match your search</h3>
+    <p style="font-size:13px;">Try a different name or clear the search.</p>
   </div>
 
   {% else %}
@@ -94,5 +108,22 @@
   {% endif %}
 
 </div>
+
+<script>
+function filterCHUs(query) {
+  const q = query.toLowerCase();
+  const cards = document.querySelectorAll('#chuGrid .location-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const name = card.querySelector('h3').textContent.toLowerCase();
+    const show = name.includes(q);
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('chuCount').textContent = visible;
+  document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+}
+</script>
+
 {% endif %}
 {%endblock%}
