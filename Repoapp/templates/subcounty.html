@@ -1,8 +1,6 @@
 {%extends 'base.html'%}{%load bootstrap5%}{% load static %}
 {%block content%}
-
 {% if user.is_authenticated %}
-
 <div class="page-header">
   <div class="container">
     <a href="{% url 'index' %}" style="color:rgba(255,255,255,0.6); margin-bottom:12px; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;">
@@ -24,13 +22,46 @@
 
 <div class="container py-2">
 
+  <!-- CHU Filter Bar -->
+  <div class="form-card mb-3" style="padding:16px 20px;">
+    <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+      <div style="flex:1; min-width:200px;">
+        <label style="font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; display:block;">Filter by Community Health Unit</label>
+        <select name="chu" id="chuDropdown" class="form-select form-select-sm" style="font-size:13px;">
+          <option value="">— All CHUs —</option>
+          {% for chu in chus %}
+            <option value="{{ chu }}" {% if selected_chu == chu %}selected{% endif %}>{{ chu }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1; min-width:200px;">
+        <label style="font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; display:block;">Search by name or username</label>
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search..." class="form-control form-control-sm" style="font-size:13px;">
+      </div>
+      <div style="padding-top:18px; display:flex; gap:8px;">
+        <button type="submit" class="btn-navy" style="font-size:12px; padding:6px 16px;">Filter</button>
+        {% if selected_chu or search_query %}
+          <a href="{% url 'subcounty-detail' subcounty.id %}" class="btn-outline-navy" style="font-size:12px; padding:6px 16px;">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
   {% if accounts %}
   <div class="data-table-wrapper">
     <div class="data-table-header">
       <span class="data-table-title">
         Accounts
         <span class="count-badge ms-2" style="background:var(--navy);color:white;font-size:11px;padding:2px 9px;border-radius:12px;">{{ accounts|length }}</span>
+        {% if selected_chu %}
+          <span style="font-size:12px; color:var(--gray-500); font-weight:400; margin-left:8px;">— {{ selected_chu }}</span>
+        {% endif %}
       </span>
+      {% if can_edit %}
+      <a href="{% url 'new-account' %}" class="btn-navy" style="font-size:12px;">
+        <i class="fas fa-plus" style="font-size:11px;"></i> Add Account
+      </a>
+      {% endif %}
     </div>
     <div class="table-responsive">
       <table class="table">
@@ -43,7 +74,7 @@
             <th>Area UUID</th>
             <th>Username</th>
             <th>Password</th>
-            <th></th>
+            {% if can_edit %}<th></th>{% endif %}
           </tr>
         </thead>
         <tbody>
@@ -56,11 +87,13 @@
             <td style="font-size:12px; color:var(--gray-600);">{{ account.Area_UUID }}</td>
             <td>{{ account.Username }}</td>
             <td>{{ account.Password }}</td>
+            {% if can_edit %}
             <td>
               <a class="btn-edit" href="{% url 'update-account' account.id %}">
                 <i class="fas fa-pen" style="font-size:10px;"></i> Edit
               </a>
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
@@ -71,16 +104,21 @@
   {% else %}
   <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
     <div style="font-size:48px; margin-bottom:16px;">📭</div>
-    <h3 style="font-size:18px; color:var(--gray-600);">No accounts in this subcounty</h3>
-    <p style="font-size:14px; margin-bottom:20px;">Add accounts to {{ subcounty.name }} to see them here.</p>
-    <a href="{% url 'new-account' %}" class="btn-navy">
-      <i class="fas fa-plus" style="font-size:12px;"></i> Add Account
-    </a>
+    {% if selected_chu or search_query %}
+      <h3 style="font-size:18px; color:var(--gray-600);">No accounts match your filter</h3>
+      <p style="font-size:14px; margin-bottom:20px;">Try a different CHU or clear the filter.</p>
+      <a href="{% url 'subcounty-detail' subcounty.id %}" class="btn-navy">Clear Filter</a>
+    {% else %}
+      <h3 style="font-size:18px; color:var(--gray-600);">No accounts in this subcounty</h3>
+      <p style="font-size:14px; margin-bottom:20px;">Add accounts to {{ subcounty.name }} to see them here.</p>
+      {% if can_edit %}
+      <a href="{% url 'new-account' %}" class="btn-navy">
+        <i class="fas fa-plus" style="font-size:12px;"></i> Add Account
+      </a>
+      {% endif %}
+    {% endif %}
   </div>
   {% endif %}
-
 </div>
-
 {% endif %}
-
 {%endblock%}

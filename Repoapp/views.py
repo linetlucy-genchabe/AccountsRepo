@@ -16,10 +16,20 @@ import json
 from django.db.models import Q
 
 FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
+EDIT_ROLES = ['Admin', 'Superuser', 'RDHSO', 'UserManager', 'CountyFocal', 'SubcountyFocal', 'WardCHA']
+VIEW_ONLY_ROLES = ['CHA', 'CHEW', 'MOH']
 
 @login_required(login_url='/login/')
 def index(request):
     profile = request.user.profile
+
+    # CHA and CHEW go straight to their assigned subcounty
+    if profile.role in ['CHA', 'CHEW']:
+        subcounties = profile.allowed_subcounties.all()
+        if subcounties.exists():
+            return redirect('subcounty-detail', subcounty_id=subcounties.first().id)
+        else:
+            messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
 
     if profile.role in FULL_ACCESS_ROLES:
         accounts = Accounts.objects.all()
@@ -85,8 +95,8 @@ def new_account(request):
     current_user = request.user
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'UserManager', 'Superuser']:
-        messages.error(request, "You do not have permission to add account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to add accounts.")
         return redirect('index')
 
     if request.method == 'POST':
@@ -107,8 +117,8 @@ def new_dashboard(request):
     current_user = request.user
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to add account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to add accounts.")
         return redirect('dashboards')
 
     if request.method == 'POST':
@@ -129,8 +139,8 @@ def new_lmsaccount(request):
     current_user = request.user
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to add account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to add accounts.")
         return redirect('lmsaccounts')
 
     if request.method == 'POST':
@@ -150,8 +160,8 @@ def new_lmsaccount(request):
 def update_account(request, id):
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to update account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to edit accounts.")
         return redirect('index')
 
     update = Accounts.objects.get(id=id)
@@ -169,8 +179,8 @@ def update_account(request, id):
 def update_dashboard(request, id):
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to update account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to edit accounts.")
         return redirect('dashboards')
 
     update = Dashboards.objects.get(id=id)
@@ -188,8 +198,8 @@ def update_dashboard(request, id):
 def update_lmsaccount(request, id):
     profile = request.user.profile
 
-    if profile.role not in ['RDHSO', 'Admin', 'Superuser']:
-        messages.error(request, "You do not have permission to update account.")
+    if profile.role not in EDIT_ROLES:
+        messages.error(request, "You do not have permission to edit accounts.")
         return redirect('lmsaccounts')
 
     update = Lmsaccounts.objects.get(id=id)
@@ -290,8 +300,36 @@ def subcounty_detail(request, subcounty_id):
             messages.error(request, "You do not have permission to view this subcounty.")
             return redirect('index')
 
+    # All CHUs in this subcounty for the dropdown
+    chus = Accounts.objects.filter(account_subcounty=subcounty)\
+        .values_list('Community_Health_Unit', flat=True)\
+        .distinct().order_by('Community_Health_Unit')
+
+    # Filter by selected CHU
+    selected_chu = request.GET.get('chu', '').strip()
+    search_query = request.GET.get('q', '').strip()
+
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
-    return render(request, 'subcounty.html', {'subcounty': subcounty, 'accounts': accounts})
+
+    if selected_chu:
+        accounts = accounts.filter(Community_Health_Unit__iexact=selected_chu)
+
+    if search_query:
+        accounts = accounts.filter(
+            Q(Name__icontains=search_query) |
+            Q(Username__icontains=search_query)
+        )
+
+    can_edit = profile.role in EDIT_ROLES
+
+    return render(request, 'subcounty.html', {
+        'subcounty': subcounty,
+        'accounts': accounts,
+        'chus': chus,
+        'selected_chu': selected_chu,
+        'search_query': search_query,
+        'can_edit': can_edit,
+    })
 
 
 @login_required(login_url='/login/')
@@ -493,45 +531,37 @@ def bulk_upload_accounts(request):
             invalid_counties = set()
             error_rows = []
 
-            for i, row in enumerate(reader, start=2):  # start=2 since row 1 is header
+            for i, row in enumerate(reader, start=2):
                 try:
-                    # Skip completely empty rows
                     if not any(col.strip() for col in row):
                         continue
 
-                    # Must have at least 9 columns
                     if len(row) < 9:
                         error_rows.append(f"Row {i}: only {len(row)} columns (expected 9)")
                         error_count += 1
                         continue
 
-                    # Strip whitespace from all fields
                     name, contact_uuid, area_uuid, community_health_unit, username, password, category_name, subcounty_name, county_name = [col.strip() for col in row[:9]]
 
-                    # Normalize empty UUIDs to None
                     contact_uuid = contact_uuid or None
                     area_uuid = area_uuid or None
 
-                    # Validate county (case-insensitive)
                     try:
                         county = County.objects.get(name__iexact=county_name)
                     except County.DoesNotExist:
                         invalid_counties.add(county_name)
                         continue
 
-                    # Validate subcounty (case-insensitive)
                     try:
                         subcounty = Subcounty.objects.get(name__iexact=subcounty_name, subcounty_county=county)
                     except Subcounty.DoesNotExist:
                         invalid_subcounties.add(subcounty_name)
                         continue
 
-                    # Check duplicate username
                     if Accounts.objects.filter(Username=username).exists():
                         duplicate_usernames.add(username)
                         continue
 
-                    # Check duplicate UUID only if non-blank
                     if contact_uuid and Accounts.objects.filter(Contact_UUID=contact_uuid).exists():
                         duplicate_uuids.add(contact_uuid)
                         continue
@@ -540,10 +570,8 @@ def bulk_upload_accounts(request):
                         duplicate_uuids.add(area_uuid)
                         continue
 
-                    # Get or create category
                     category, _ = Category.objects.get_or_create(name=category_name)
 
-                    # Create account
                     Accounts.objects.create(
                         Name=name,
                         Contact_UUID=contact_uuid,
@@ -562,7 +590,6 @@ def bulk_upload_accounts(request):
                     error_rows.append(f"Row {i}: {str(e)}")
                     error_count += 1
 
-            # Report results
             if invalid_subcounties:
                 messages.error(request, f"Unrecognised subcounties (check spelling): {', '.join(sorted(invalid_subcounties))}")
             if invalid_counties:
