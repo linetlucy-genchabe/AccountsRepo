@@ -578,6 +578,12 @@ def export_accounts_csv(request):
 
 
 def bulk_upload_accounts(request):
+
+    profile = request.user.profile
+    if profile.role not in ['Admin', 'Superuser', 'RDHSO', 'UserManager', 'CountyFocal']:
+        messages.error(request, "You do not have permission to bulk upload accounts.")
+        return redirect('index')
+
     if request.method == "POST":
         form = AccountUploadForm(request.POST, request.FILES)
         if form.is_valid():
