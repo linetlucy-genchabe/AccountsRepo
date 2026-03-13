@@ -81,6 +81,7 @@ class Profile(models.Model):
     allowed_countries = models.ManyToManyField(Countries, blank=True, related_name='allowed_users')
     allowed_counties = models.ManyToManyField(County, blank=True, related_name='allowed_users')
     allowed_subcounties = models.ManyToManyField(Subcounty, blank=True, related_name='allowed_users')
+    allowed_chus = models.TextField(blank=True, default='', help_text="Comma-separated CHU names, e.g. 'Alwala CHU, Bunyore CHU'. Leave blank to allow all CHUs in assigned subcounty.")
 
     def get_accessible_counties(self):
         accessible_counties = County.objects.none()

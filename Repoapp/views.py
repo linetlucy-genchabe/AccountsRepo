@@ -99,6 +99,15 @@ def cha_home(request):
     search_query = request.GET.get('q', '').strip()
 
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
+
+    # Filter to allowed CHUs if specified on the profile
+    if profile.allowed_chus:
+        allowed = [c.strip() for c in profile.allowed_chus.split(',') if c.strip()]
+        if allowed:
+            accounts = accounts.filter(Community_Health_Unit__in=allowed)
+            # Also restrict the CHU dropdown to only their allowed CHUs
+            chus = chus.filter(Community_Health_Unit__in=allowed)
+
     accounts_total = accounts.count()
 
     if selected_chu:
