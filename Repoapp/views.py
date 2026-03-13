@@ -172,7 +172,7 @@ def update_account(request, id):
             return redirect(index)
     else:
         form2 = AccountUpdateForm(instance=update)
-    return render(request, 'edit_account.html', {'form2': form2})
+    return render(request, 'edit_account.html', {'form2': form2, 'account': update})
 
 
 @login_required(login_url='/login/')
