@@ -14,22 +14,30 @@ import csv
 from django.http import JsonResponse
 import json
 from django.db.models import Q
+from django.utils import timezone
 
 FULL_ACCESS_ROLES = ['Admin', 'Superuser', 'MOH', 'RDHSO', 'UserManager']
 EDIT_ROLES = ['Admin', 'Superuser', 'RDHSO', 'UserManager', 'CountyFocal', 'SubcountyFocal', 'WardCHA']
 VIEW_ONLY_ROLES = ['CHA', 'CHEW', 'MOH']
 
+
+def get_greeting():
+    hour = timezone.localtime().hour
+    if hour < 12:
+        return "Good morning"
+    elif hour < 17:
+        return "Good afternoon"
+    else:
+        return "Good evening"
+
+
 @login_required(login_url='/login/')
 def index(request):
     profile = request.user.profile
 
-    # CHA and CHEW go straight to their assigned subcounty
+    # CHA and CHEW go straight to their personal home
     if profile.role in ['CHA', 'CHEW']:
-        subcounties = profile.allowed_subcounties.all()
-        if subcounties.exists():
-            return redirect('subcounty_detail', subcounty_id=subcounties.first().id)
-        else:
-            messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
+        return redirect('cha_home')
 
     if profile.role in FULL_ACCESS_ROLES:
         accounts = Accounts.objects.all()
@@ -43,7 +51,61 @@ def index(request):
     return render(request, 'index.html', {
         "accounts": accounts,
         "counties": counties,
-        "countries": countries
+        "countries": countries,
+        "greeting": get_greeting(),
+    })
+
+
+@login_required(login_url='/login/')
+def cha_home(request):
+    profile = request.user.profile
+
+    # Only CHA and CHEW use this view
+    if profile.role not in ['CHA', 'CHEW']:
+        return redirect('index')
+
+    subcounties = profile.allowed_subcounties.all()
+    if not subcounties.exists():
+        messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
+        return render(request, 'cha_home.html', {
+            'greeting': get_greeting(),
+            'subcounty': None,
+            'accounts': [],
+            'chus': [],
+            'selected_chu': '',
+            'search_query': '',
+            'accounts_total': 0,
+        })
+
+    subcounty = subcounties.first()
+
+    # All CHUs in this subcounty for the dropdown
+    chus = Accounts.objects.filter(account_subcounty=subcounty)\
+        .values_list('Community_Health_Unit', flat=True)\
+        .distinct().order_by('Community_Health_Unit')
+
+    selected_chu = request.GET.get('chu', '').strip()
+    search_query = request.GET.get('q', '').strip()
+
+    accounts = Accounts.objects.filter(account_subcounty=subcounty)
+    accounts_total = accounts.count()
+
+    if selected_chu:
+        accounts = accounts.filter(Community_Health_Unit__iexact=selected_chu)
+    if search_query:
+        accounts = accounts.filter(
+            Q(Name__icontains=search_query) |
+            Q(Username__icontains=search_query)
+        )
+
+    return render(request, 'cha_home.html', {
+        'greeting': get_greeting(),
+        'subcounty': subcounty,
+        'accounts': accounts,
+        'chus': chus,
+        'selected_chu': selected_chu,
+        'search_query': search_query,
+        'accounts_total': accounts_total,
     })
 
 
@@ -169,7 +231,7 @@ def update_account(request, id):
         form2 = AccountUpdateForm(request.POST, request.FILES, instance=update)
         if form2.is_valid():
             form2.save()
-            return redirect(index)
+            return redirect('subcounty_detail', subcounty_id=update.account_subcounty.id)
     else:
         form2 = AccountUpdateForm(instance=update)
     return render(request, 'edit_account.html', {'form2': form2, 'account': update})
@@ -300,12 +362,10 @@ def subcounty_detail(request, subcounty_id):
             messages.error(request, "You do not have permission to view this subcounty.")
             return redirect('index')
 
-    # All CHUs in this subcounty for the dropdown
     chus = Accounts.objects.filter(account_subcounty=subcounty)\
         .values_list('Community_Health_Unit', flat=True)\
         .distinct().order_by('Community_Health_Unit')
 
-    # Filter by selected CHU
     selected_chu = request.GET.get('chu', '').strip()
     search_query = request.GET.get('q', '').strip()
 
@@ -313,7 +373,6 @@ def subcounty_detail(request, subcounty_id):
 
     if selected_chu:
         accounts = accounts.filter(Community_Health_Unit__iexact=selected_chu)
-
     if search_query:
         accounts = accounts.filter(
             Q(Name__icontains=search_query) |
@@ -521,7 +580,7 @@ def bulk_upload_accounts(request):
 
             decoded_file = csv_file.read().decode('utf-8').splitlines()
             reader = csv.reader(decoded_file)
-            next(reader)  # skip header row
+            next(reader)
 
             success_count = 0
             error_count = 0

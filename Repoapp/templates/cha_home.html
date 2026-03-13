@@ -1,0 +1,115 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+{% if user.is_authenticated %}
+
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1>{{ greeting }}, {{ user.first_name|default:user.username }} 👋</h1>
+        <p style="opacity:0.85;">
+          {{ user.profile.role }} &nbsp;·&nbsp; {{ subcounty.name }} Subcounty
+          &nbsp;·&nbsp; {{ accounts_total }} account{{ accounts_total|pluralize }} in your area
+        </p>
+      </div>
+      <div class="header-action">
+        <a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn-gold">
+          <i class="fas fa-download" style="font-size:12px;"></i> Export CSV
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-3">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- CHU Filter Bar -->
+  <div class="form-card mb-3" style="padding:16px 20px;">
+    <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+      <div style="flex:1; min-width:200px;">
+        <label style="font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; display:block;">Filter by Community Health Unit</label>
+        <select name="chu" class="form-select form-select-sm" style="font-size:13px;">
+          <option value="">— All CHUs —</option>
+          {% for chu in chus %}
+            <option value="{{ chu }}" {% if selected_chu == chu %}selected{% endif %}>{{ chu }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1; min-width:200px;">
+        <label style="font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; display:block;">Search by name or username</label>
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search..." class="form-control form-control-sm" style="font-size:13px;">
+      </div>
+      <div style="padding-top:18px; display:flex; gap:8px;">
+        <button type="submit" class="btn-navy" style="font-size:12px; padding:6px 16px;">Filter</button>
+        {% if selected_chu or search_query %}
+          <a href="{% url 'cha_home' %}" class="btn-outline-navy" style="font-size:12px; padding:6px 16px;">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  {% if accounts %}
+  <div class="data-table-wrapper">
+    <div class="data-table-header">
+      <span class="data-table-title">
+        Accounts
+        <span class="count-badge ms-2" style="background:var(--navy);color:white;font-size:11px;padding:2px 9px;border-radius:12px;">{{ accounts|length }}</span>
+        {% if selected_chu %}
+          <span style="font-size:12px; color:var(--gray-500); font-weight:400; margin-left:8px;">— {{ selected_chu }}</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Community Health Unit</th>
+            <th>Contact UUID</th>
+            <th>Area UUID</th>
+            <th>Username</th>
+            <th>Password</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in accounts %}
+          <tr>
+            <td><strong>{{ account.Name }}</strong></td>
+            <td>{{ account.Community_Health_Unit }}</td>
+            <td style="font-size:12px; color:var(--gray-600);">{{ account.Contact_UUID }}</td>
+            <td style="font-size:12px; color:var(--gray-600);">{{ account.Area_UUID }}</td>
+            <td>{{ account.Username }}</td>
+            <td>{{ account.Password }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
+    <div style="font-size:48px; margin-bottom:16px;">📭</div>
+    {% if selected_chu or search_query %}
+      <h3 style="font-size:18px; color:var(--gray-600);">No accounts match your filter</h3>
+      <p style="font-size:14px; margin-bottom:20px;">Try a different CHU or clear the filter.</p>
+      <a href="{% url 'cha_home' %}" class="btn-navy">Clear Filter</a>
+    {% else %}
+      <h3 style="font-size:18px; color:var(--gray-600);">No accounts in your subcounty yet</h3>
+      <p style="font-size:14px;">Contact your administrator to add accounts.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
+{%endblock%}

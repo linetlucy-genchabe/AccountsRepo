@@ -7,21 +7,23 @@
   <div class="container">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div>
-        <h1>Welcome back, {{ user.username }}</h1>
+        <h1>{{ greeting }}, {{ user.first_name|default:user.username }} 👋</h1>
         <p>Select an account type and region to browse credentials</p>
       </div>
       <div class="header-action">
-        {% if user.profile.role in "Admin,RDHSO,UserManager,Superuser" %}
+        {% if user.profile.role in "Admin,RDHSO,UserManager,Superuser,CountyFocal,SubcountyFocal,WardCHA" %}
         <a href="{% url 'new-account' %}" class="btn-gold">
           <i class="fas fa-plus" style="font-size:12px;"></i> New Account
         </a>
         {% endif %}
+        {% if user.profile.role in "Admin,RDHSO,UserManager,Superuser" %}
         <a href="{% url 'bulk_upload_accounts' %}" style="
           background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.25);
           padding:9px 20px; border-radius:var(--radius); font-size:14px; font-weight:500;
           display:inline-flex; align-items:center; gap:7px; text-decoration:none;">
           <i class="fas fa-upload" style="font-size:12px;"></i> Bulk Upload
         </a>
+        {% endif %}
       </div>
     </div>
   </div>
