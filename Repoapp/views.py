@@ -39,10 +39,19 @@ def index(request):
     if profile.role in ['CHA', 'CHEW']:
         return redirect('cha_home')
 
-    if profile.role in FULL_ACCESS_ROLES:
-        accounts = Accounts.objects.all()
-        counties = County.objects.all()
-        countries = Countries.objects.all()
+    # SubcountyFocal → land on their assigned subcounty directly
+    if profile.role == 'SubcountyFocal':
+        subcounties = profile.allowed_subcounties.all()
+        if subcounties.exists():
+            return redirect('subcounty_detail', subcounty_id=subcounties.first().id)
+        messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
+
+    # CountyFocal → land on their assigned county directly
+    if profile.role == 'CountyFocal':
+        counties = profile.allowed_counties.all()
+        if counties.exists():
+            return redirect('county_detail', county_id=counties.first().id)
+        messages.warning(request, "You have no assigned county. Please contact your administrator.")
     else:
         accounts = profile.get_accessible_accounts()
         counties = profile.get_accessible_counties()
