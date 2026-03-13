@@ -12,10 +12,12 @@
           &nbsp;·&nbsp; {{ accounts_total }} account{{ accounts_total|pluralize }} in your area
         </p>
       </div>
-      <div class="header-action">
+       <div class="header-action">
+        {% if subcounty %}
         <a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn-gold">
           <i class="fas fa-download" style="font-size:12px;"></i> Export CSV
         </a>
+        {% endif %}
       </div>
     </div>
   </div>
