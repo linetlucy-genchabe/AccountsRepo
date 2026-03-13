@@ -3,7 +3,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Repoapp', '0011_accounts_account_country_dashboards_account_country_and_more'),
+        ('Repoapp', '0012_alter_accounts_contact_uuid'),
     ]
 
     operations = [
