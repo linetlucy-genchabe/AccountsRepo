@@ -39,19 +39,21 @@ def index(request):
     if profile.role in ['CHA', 'CHEW']:
         return redirect('cha_home')
 
-    # SubcountyFocal → land on their assigned subcounty directly
+    # SubcountyFocal -> CHU summary home
     if profile.role == 'SubcountyFocal':
-        subcounties = profile.allowed_subcounties.all()
-        if subcounties.exists():
-            return redirect('subcounty_detail', subcounty_id=subcounties.first().id)
-        messages.warning(request, "You have no assigned subcounty. Please contact your administrator.")
+        return redirect('subcounty_focal_home')
 
-    # CountyFocal → land on their assigned county directly
+    # CountyFocal -> their assigned county page
     if profile.role == 'CountyFocal':
         counties = profile.allowed_counties.all()
         if counties.exists():
             return redirect('county_detail', county_id=counties.first().id)
-        messages.warning(request, "You have no assigned county. Please contact your administrator.")
+        messages.warning(request, 'You have no assigned county. Please contact your administrator.')
+
+    if profile.role in FULL_ACCESS_ROLES:
+        accounts = Accounts.objects.all()
+        counties = County.objects.all()
+        countries = Countries.objects.all()
     else:
         accounts = profile.get_accessible_accounts()
         counties = profile.get_accessible_counties()
@@ -117,6 +119,40 @@ def cha_home(request):
         'accounts_total': accounts_total,
     })
 
+
+
+@login_required(login_url='/login/')
+def subcounty_focal_home(request):
+    profile = request.user.profile
+
+    if profile.role != 'SubcountyFocal':
+        return redirect('index')
+
+    subcounties = profile.allowed_subcounties.all()
+    if not subcounties.exists():
+        messages.warning(request, 'You have no assigned subcounty. Please contact your administrator.')
+        return render(request, 'subcounty_focal_home.html', {
+            'greeting': get_greeting(),
+            'subcounty': None,
+            'chus': [],
+            'total_accounts': 0,
+            'can_edit': profile.role in EDIT_ROLES,
+        })
+
+    subcounty = subcounties.first()
+
+    from django.db.models import Count
+    chus = Accounts.objects.filter(account_subcounty=subcounty)         .values('Community_Health_Unit')         .annotate(count=Count('id'), name=models.F('Community_Health_Unit'))         .order_by('Community_Health_Unit')
+
+    total_accounts = Accounts.objects.filter(account_subcounty=subcounty).count()
+
+    return render(request, 'subcounty_focal_home.html', {
+        'greeting': get_greeting(),
+        'subcounty': subcounty,
+        'chus': chus,
+        'total_accounts': total_accounts,
+        'can_edit': profile.role in EDIT_ROLES,
+    })
 
 @login_required(login_url='/login/')
 def dashboards(request):
@@ -578,12 +614,6 @@ def export_accounts_csv(request):
 
 
 def bulk_upload_accounts(request):
-
-    profile = request.user.profile
-    if profile.role not in ['Admin', 'Superuser', 'RDHSO', 'UserManager', 'CountyFocal']:
-        messages.error(request, "You do not have permission to bulk upload accounts.")
-        return redirect('index')
-
     if request.method == "POST":
         form = AccountUploadForm(request.POST, request.FILES)
         if form.is_valid():

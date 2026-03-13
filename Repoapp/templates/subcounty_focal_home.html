@@ -1,0 +1,98 @@
+{%extends 'base.html'%}{%load bootstrap5%}{% load static %}
+{%block content%}
+{% if user.is_authenticated %}
+
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1>{{ greeting }}, {{ user.first_name|default:user.username }} 👋</h1>
+        <p style="opacity:0.85;">
+          Subcounty Focal &nbsp;·&nbsp; {{ subcounty.name }} Subcounty
+          &nbsp;·&nbsp; {{ total_accounts }} account{{ total_accounts|pluralize }} across {{ chus|length }} CHU{{ chus|length|pluralize }}
+        </p>
+      </div>
+      <div class="header-action">
+        <a href="{% url 'export_subcounty_accounts_csv' subcounty.id %}" class="btn-gold">
+          <i class="fas fa-download" style="font-size:12px;"></i> Export CSV
+        </a>
+        {% if can_edit %}
+        <a href="{% url 'bulk_upload_accounts' %}" style="
+          background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.25);
+          padding:9px 20px; border-radius:var(--radius); font-size:14px; font-weight:500;
+          display:inline-flex; align-items:center; gap:7px; text-decoration:none;">
+          <i class="fas fa-upload" style="font-size:12px;"></i> Bulk Upload
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if chus %}
+
+  <!-- Summary stat strip -->
+  <div class="d-flex gap-3 flex-wrap mb-4">
+    <div class="form-card" style="flex:1; min-width:140px; padding:16px 20px; text-align:center;">
+      <div style="font-size:28px; font-weight:700; color:var(--navy);">{{ total_accounts }}</div>
+      <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">Total Accounts</div>
+    </div>
+    <div class="form-card" style="flex:1; min-width:140px; padding:16px 20px; text-align:center;">
+      <div style="font-size:28px; font-weight:700; color:var(--navy);">{{ chus|length }}</div>
+      <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">Community Health Units</div>
+    </div>
+    <div class="form-card" style="flex:1; min-width:140px; padding:16px 20px; text-align:center;">
+      <div style="font-size:28px; font-weight:700; color:var(--navy);">{{ subcounty.name }}</div>
+      <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">Subcounty</div>
+    </div>
+  </div>
+
+  <!-- CHU Cards -->
+  <div class="section-label mb-3">
+    <h2>Community Health Units</h2>
+    <span class="count-badge">{{ chus|length }}</span>
+  </div>
+
+  <div class="location-grid">
+    {% for chu in chus %}
+    <a href="{% url 'subcounty_detail' subcounty.id %}?chu={{ chu.name|urlencode }}" class="location-card" style="text-decoration:none;">
+      <div class="location-card-icon">🏥</div>
+      <h3 style="font-size:15px;">{{ chu.name }}</h3>
+      <div style="margin-top:6px;">
+        <span class="count-badge" style="background:var(--navy); color:white; font-size:11px; padding:2px 10px; border-radius:12px;">
+          {{ chu.count }} account{{ chu.count|pluralize }}
+        </span>
+      </div>
+      <span style="font-size:12px; color:var(--gray-500); margin-top:6px; display:block;">View accounts →</span>
+      <div class="location-card-arrow">→</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="text-align:center; padding:80px 20px; color:var(--gray-400);">
+    <div style="font-size:48px; margin-bottom:16px;">📭</div>
+    <h3 style="font-size:18px; color:var(--gray-600);">No accounts in {{ subcounty.name }} yet</h3>
+    <p style="font-size:14px;">Contact your administrator or use bulk upload to add accounts.</p>
+    {% if can_edit %}
+    <a href="{% url 'bulk_upload_accounts' %}" class="btn-navy mt-3">
+      <i class="fas fa-upload" style="font-size:12px;"></i> Bulk Upload
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
+{%endblock%}
