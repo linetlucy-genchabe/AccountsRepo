@@ -638,7 +638,9 @@ def update_subcounty(request, id):
 
 # ─── CSV EXPORTS ────────────────────────────────────────────────
 
+@login_required(login_url='/login/')
 def export_accounts_csv(request):
+    profile = request.user.profile
     county_id = request.GET.get('county')
     subcounty_id = request.GET.get('subcounty')
 
@@ -649,7 +651,23 @@ def export_accounts_csv(request):
     writer.writerow(['Name', 'Contact UUID', 'Area UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
-    accounts = Accounts.objects.all()
+    # Base queryset scoped to what this user can access
+    if profile.role in FULL_ACCESS_ROLES:
+        accounts = Accounts.objects.all()
+    else:
+        accounts = profile.get_accessible_accounts()
+
+    # Further filter by CHU if CHA/CHEW with allowed_chus set
+    if profile.role in ['CHA', 'CHEW'] and profile.allowed_chus:
+        allowed = [c.strip() for c in profile.allowed_chus.split(',') if c.strip()]
+        if allowed:
+            from django.db.models import Q as Qchu
+            chu_filter = Qchu()
+            for chu_name in allowed:
+                chu_filter |= Qchu(Community_Health_Unit__iexact=chu_name)
+            accounts = accounts.filter(chu_filter)
+
+    # Optional extra filters from query params
     if county_id:
         county = get_object_or_404(County, id=county_id)
         accounts = accounts.filter(account_county=county)
@@ -776,7 +794,9 @@ def bulk_upload_accounts(request):
     return render(request, 'bulk_upload.html', {'form': form})
 
 
+@login_required(login_url='/login/')
 def export_subcounty_accounts_csv(request, subcounty_id):
+    profile = request.user.profile
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="subcounty_{subcounty_id}_accounts.csv"'
 
@@ -784,10 +804,17 @@ def export_subcounty_accounts_csv(request, subcounty_id):
     writer.writerow(['Name', 'Contact UUID', 'Area UUID', 'Community Health Unit', 'Username', 'Password',
                      'Account Category', 'Subcounty', 'County'])
 
-    try:
-        accounts = Accounts.objects.filter(account_subcounty_id=subcounty_id)
-    except Exception as e:
-        accounts = []
+    accounts = Accounts.objects.filter(account_subcounty_id=subcounty_id)
+
+    # Restrict to allowed CHUs if CHA/CHEW with specific CHUs set
+    if profile.role in ['CHA', 'CHEW'] and profile.allowed_chus:
+        allowed = [c.strip() for c in profile.allowed_chus.split(',') if c.strip()]
+        if allowed:
+            from django.db.models import Q as Qchu
+            chu_filter = Qchu()
+            for chu_name in allowed:
+                chu_filter |= Qchu(Community_Health_Unit__iexact=chu_name)
+            accounts = accounts.filter(chu_filter)
 
     for account in accounts:
         writer.writerow([
