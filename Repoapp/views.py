@@ -98,11 +98,21 @@ def cha_home(request):
     accounts = Accounts.objects.filter(account_subcounty=subcounty)
 
     # Restrict to allowed CHUs if set on profile
+    # DEBUG: show what is saved (remove after confirming it works)
+    if profile.allowed_chus:
+        import logging; logging.getLogger(__name__).warning(f"CHA allowed_chus raw value: [{profile.allowed_chus}]")
     if profile.allowed_chus:
         allowed = [c.strip() for c in profile.allowed_chus.split(',') if c.strip()]
         if allowed:
-            accounts = accounts.filter(Community_Health_Unit__in=allowed)
-            chus = [c for c in chus if c in allowed]
+            # Use case-insensitive matching to avoid name mismatch
+            from django.db.models import Q as Qchu
+            chu_filter = Qchu()
+            for chu_name in allowed:
+                chu_filter |= Qchu(Community_Health_Unit__iexact=chu_name)
+            accounts = accounts.filter(chu_filter)
+            # Filter dropdown to only allowed CHUs (case-insensitive)
+            allowed_lower = [a.lower() for a in allowed]
+            chus = [c for c in chus if c.lower() in allowed_lower]
 
     accounts_total = accounts.count()
 
