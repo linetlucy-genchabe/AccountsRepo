@@ -57,6 +57,7 @@ urlpatterns = [
     path('bulk-upload/', views.bulk_upload_accounts, name='bulk_upload_accounts'),
     path('home/', views.cha_home, name='cha_home'),
     path('subcounty-focal/', views.subcounty_focal_home, name='subcounty_focal_home'),
+    path('county-focal/', views.county_focal_home, name='county_focal_home'),
 ]
 
 if settings.DEBUG:
